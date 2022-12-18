@@ -82,14 +82,10 @@ class World:
             if entity.id == id:
                 return entity
 
-        return None
-
     def get_map_object_by_id(self, id: int) -> MapObject:
         for map_object in self.map_objects:
             if map_object.id == id:
                 return map_object
-
-        return None
 
     def add_entity(self, entity: Entity, needs_id: bool = True):
         if needs_id:
