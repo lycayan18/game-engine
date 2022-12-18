@@ -4,7 +4,8 @@ from core.vector3 import Vector3
 
 
 class ViewableEntity(Entity):
-    def __init__(self, class_name: str, position: Vector3 = Vector3(0, 0, 0), mesh: Mesh = None, rotation: Vector3 = Vector3(0, 0, 0), scale: Vector3 = Vector3(1, 1, 1)):
+    def __init__(self, class_name: str, position: Vector3 = Vector3(0, 0, 0), mesh: Mesh = None,
+                 rotation: Vector3 = Vector3(0, 0, 0), scale: Vector3 = Vector3(1, 1, 1)):
         super().__init__(position, class_name)
         self.mesh = mesh
         self.rotation = rotation
