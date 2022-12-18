@@ -7,12 +7,6 @@ class Entity:
         self.class_name = class_name
         self.id = 0
 
-    def set_position(self, position: Vector3):
-        self.position = position
-
-    def get_position(self):
-        return self.position
-
     def set_state(self, state: dict):
         self.position = Vector3(
             state['position']['x'], state['position']['y'], state['position']['z'])
