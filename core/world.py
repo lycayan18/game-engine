@@ -1,3 +1,4 @@
+from core.utils.event_emitter import EventEmitter
 from core.entity import Entity
 from core.map_object import MapObject
 from core.registry import Registry
@@ -10,6 +11,7 @@ class World:
         self.entity_unique_id = 0  # For generating entity unique id
         self.map_object_unique_id = 0  # For generating map object unique id
         self.registry = registry
+        self.event_emitter = EventEmitter()
 
     def set_state(self, state: dict):
         updated_entities_id: list[int] = list()
@@ -94,6 +96,8 @@ class World:
 
         self.entities.append(entity)
 
+        self.event_emitter.emit("entity_added", entity)
+
     def add_map_object(self, map_object: MapObject, needs_id: bool = True):
         if needs_id:
             map_object.id = self.map_object_unique_id
@@ -102,21 +106,35 @@ class World:
 
         self.map_objects.append(map_object)
 
+        self.event_emitter.emit("map_object_added", map_object)
+
     def remove_entity(self, entity: Entity):
         self.entities.remove(entity)
+
+        self.event_emitter.emit("entity_removed", entity)
 
     def remove_map_object(self, map_object: MapObject):
         self.map_objects.remove(map_object)
 
+        self.event_emitter.emit("map_object_removed", map_object)
+
     def remove_all_entities(self):
         self.entities.clear()
+
+        self.event_emitter.emit("all_entities_removed")
 
     def remove_all_map_object(self):
         self.map_objects.clear()
 
+        self.event_emitter.emit("all_map_objects_removed")
+
     def tick(self):
+        self.event_emitter.emit("before_tick")
+
         for entity in self.entities:
             entity.think()
 
         for object in self.map_objects:
             object.think()
+
+        self.event_emitter.emit("after_tick")
