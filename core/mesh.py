@@ -1,9 +1,6 @@
 import pythree
-from core.material import Material
 
 
 class Mesh:
-    def __init__(self, geometry: pythree.Geometry, material: Material):
+    def __init__(self, geometry: pythree.Geometry):
         self.geometry = geometry
-        self.material = material
-

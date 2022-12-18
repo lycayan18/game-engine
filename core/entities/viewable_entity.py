@@ -32,13 +32,13 @@ class ViewableEntity(Entity):
         super(Entity, self).set_state(state)
 
         self.rotation = Vector3(
-            state['rotation']['x'], state['rotation']['y'], self['rotation']['z'])
+            state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])
         self.scale = Vector3(
-            state['scale']['x'], state['scale']['y'], self['scale']['z'])
+            state['scale']['x'], state['scale']['y'], state['scale']['z'])
 
     def get_state(self) -> dict:
         state = {
-            **super().get_state(),
+            **super(ViewableEntity, self).get_state(),
             'rotation': {
                 'x': self.rotation.x,
                 'y': self.rotation.y,
