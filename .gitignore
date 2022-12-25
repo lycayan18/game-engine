@@ -1,2 +1,8 @@
-.idea
-**/__pycache__/**
+/.idea
+**/__pycache__
+/example
+/pythree/src/pythree.pro
+/pythree/src/pythree.pro.user
+/pythree/build/
+/*.pyd
+/*.so
