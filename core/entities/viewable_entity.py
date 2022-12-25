@@ -39,7 +39,7 @@ class ViewableEntity(Entity):
 
     def get_state(self) -> dict:
         state = {
-            **super().get_state(),
+            **super(ViewableEntity, self).get_state(),
             'rotation': {
                 'x': self.rotation.x,
                 'y': self.rotation.y,
