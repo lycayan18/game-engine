@@ -1,6 +1,5 @@
 import ctypes
 import glm
-from pyglet.gl import *
 from OpenGL.GL import *
 from core.entities.viewable_entity import ViewableEntity
 from core.mesh import Mesh
