@@ -14,6 +14,9 @@ class Engine:
 
         self.modules.append(module)
 
+    def register_mesh(self, mesh):
+        self.event_emitter.emit("new_mesh", mesh)
+
     def tick(self):
         self.event_emitter.emit("tick")
         self.world.tick()

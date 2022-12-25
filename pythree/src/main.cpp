@@ -47,12 +47,47 @@ extern "C"
         .tp_new = geometry_new,
     };
 
+    /*
+    ***************************************************
+    **  Matrix class
+    ***************************************************
+    */
+
+    static PyMethodDef matrix_methods[] = {
+        {"to_bytes",                    (PyCFunction)matrix_toBytes,                    METH_NOARGS,                PyDoc_STR("pythree.Matrix.to_bytes(): Convert matrix to bytes")},
+        {"clone",                       (PyCFunction)matrix_clone,                      METH_NOARGS,                PyDoc_STR("pythree.Matrix.clone(): Clone matrix")},
+        {"from_rotation_shift_scale",   (PyCFunction)PyMatrix_fromRotationShiftScale,   METH_VARARGS | METH_STATIC,  PyDoc_STR("pythree.Matrix.from_rotation_shift_scale(): Create matrix from rotation, shift and scale")},
+        {"perspective",                 (PyCFunction)PyMatrix_perspective,              METH_VARARGS | METH_STATIC,  PyDoc_STR("pythree.Matrix.perspective(): Create perspective matrix")},
+        {"identity",                    (PyCFunction)PyMatrix_identity,                 METH_NOARGS | METH_STATIC,   PyDoc_STR("pythree.Matrix.identity(): Create identity matrix")},
+        {NULL, NULL, 0, NULL}
+    };
+
+    static struct PyMemberDef matrix_members[] = {
+        {NULL}
+    };
+
+    extern PyTypeObject matrix_type = {
+        .ob_base = PyVarObject_HEAD_INIT(NULL, 0)
+        .tp_name = "pythree.Matrix",
+        .tp_basicsize = sizeof(matrixobject),
+        .tp_itemsize = 0,
+        .tp_dealloc = (destructor)matrix_dealloc,
+        .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
+        .tp_methods = matrix_methods,
+        .tp_members = matrix_members,
+        .tp_init = (initproc)matrix_init,
+        .tp_new = matrix_new,
+    };
+
     PyMODINIT_FUNC
     PyInit_pythree(void)
     {
         PyObject *m;
 
         if (PyType_Ready(&geometry_type) < 0)
+            return NULL;
+
+        if (PyType_Ready(&matrix_type) < 0)
             return NULL;
 
         m = PyModule_Create(&pythreemodule);
@@ -65,6 +100,16 @@ extern "C"
         if (PyModule_AddObject(m, "Geometry", (PyObject *)&geometry_type) < 0)
         {
             Py_DECREF(&geometry_type);
+            Py_DECREF(m);
+
+            return NULL;
+        }
+
+        Py_INCREF(&matrix_type);
+
+        if (PyModule_AddObject(m, "Matrix", (PyObject *)&matrix_type) < 0)
+        {
+            Py_DECREF(&matrix_type);
             Py_DECREF(m);
 
             return NULL;
