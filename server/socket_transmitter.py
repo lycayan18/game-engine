@@ -21,6 +21,8 @@ class SocketTransmitter:
             self.clients.append(client)
         except BlockingIOError:
             pass
+        except InterruptedError:
+            print('SocketTransmitter: the client acception was interrupted')
 
     def get_request(self):
         for client in self.clients:

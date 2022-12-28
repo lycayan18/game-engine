@@ -1,7 +1,7 @@
 import json
 from core.world import World
 from core.engine import Engine
-from server_transmitter import SocketTransmitter
+from socket_transmitter import SocketTransmitter
 
 
 class ServerEngine(Engine):
