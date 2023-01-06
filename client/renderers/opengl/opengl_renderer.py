@@ -6,6 +6,8 @@ from core.mesh import Mesh
 from core.module import BaseModule
 from core.utils.event_emitter import EventEmitter
 from core.world import World
+from client.graphics_module import GraphicsModule
+from client.camera import Camera
 
 BASE_VERTEX_SHADER = """
 #version 100
@@ -28,16 +30,16 @@ void main() {
 """
 
 
-class OpenGLRenderer(BaseModule):
-    def __init__(self, width: int, height: int):
-        super().__init__()
+class OpenGLRenderer(GraphicsModule):
+    def __init__(self, width: int, height: int, camera: Camera):
+        super(OpenGLRenderer, self).__init__(camera)
 
         self.program = None
         self.buffer_mesh_pairs = []
         self.width = width
         self.height = height
 
-        self.init_gl(width, height)
+        self.init_gl()
 
     def init_module(self, world: World, event_emitter: EventEmitter):
         super().init_module(world, event_emitter)
@@ -45,7 +47,7 @@ class OpenGLRenderer(BaseModule):
         event_emitter.on("new_mesh", self.handle_new_mesh)
         event_emitter.on("tick", self.draw)
 
-    def init_gl(self, width: int, height: int):
+    def init_gl(self):
         program = self.create_shader(BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER)
 
         self.program = program
@@ -122,6 +124,38 @@ class OpenGLRenderer(BaseModule):
         projection_matrix = glm.perspective(
             glm.radians(90), self.width / self.height, 0.1, 100.0)
 
+        # Create camera view matrix
+
+        camera = self.get_camera()
+
+        camera_view_matrix = glm.mat4x4()
+
+        # Rotate
+
+        camera_rotation = camera.get_rotation()
+
+        camera_view_matrix = glm.rotate(camera_view_matrix, camera_rotation.x, glm.vec3(
+            1.0, 0.0, 0.0
+        ))
+
+        camera_view_matrix = glm.rotate(camera_view_matrix, camera_rotation.y, glm.vec3(
+            0.0, 1.0, 0.0
+        ))
+
+        camera_view_matrix = glm.rotate(camera_view_matrix, camera_rotation.z, glm.vec3(
+            0.0, 0.0, 1.0
+        ))
+
+        camera_position = camera.get_position()
+
+        # Translate
+
+        camera_rotation = camera.get_rotation()
+
+        camera_view_matrix = glm.translate(camera_view_matrix, glm.vec3(
+            -camera_position.x, -camera_position.y, camera_position.z
+        ))
+
         for entity in self.world.entities:
             if isinstance(entity, ViewableEntity):
                 # *************************************************
@@ -142,7 +176,7 @@ class OpenGLRenderer(BaseModule):
                 glUniformMatrix4fv(projection_matrix_location,
                                    1, False, projection_matrix.to_bytes())
 
-                world_view_matrix: glm.mat4x4 = glm.mat4x4()
+                world_view_matrix: glm.mat4x4 = glm.mat4x4(camera_view_matrix)
 
                 world_view_matrix = glm.translate(world_view_matrix, glm.vec3(
                     entity.position.x, entity.position.y, -entity.position.z))
