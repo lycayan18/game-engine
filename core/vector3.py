@@ -10,6 +10,9 @@ class Vector3:
     def length(self):
         return hypot(self.x, self.y, self.z)
 
+    def calculate_distance(self, another):
+        return hypot(self.x - another.x, self.y - another.y, self.z - another.z)
+
     def __add__(self, another):
         return Vector3(another.x + self.x, another.y + self.y, another.z + self.z)
 
@@ -40,3 +43,7 @@ class Vector3:
             return Vector3(0, 0, 0)
 
         return vec / Vector3(length)
+
+    @staticmethod
+    def distance(a, b):
+        return hypot(a.x - b.x, a.y - b.y, a.z - b.z)
