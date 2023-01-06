@@ -1,3 +1,4 @@
+import datetime
 from core.utils.event_emitter import EventEmitter
 from core.entity import Entity
 from core.map_object import MapObject
@@ -12,6 +13,7 @@ class World:
         self.map_object_unique_id = 0  # For generating map object unique id
         self.registry = registry
         self.event_emitter = EventEmitter()
+        self.start_time = datetime.datetime.now()
 
     def set_state(self, state: dict):
         updated_entities_id: list[int] = list()
@@ -138,3 +140,6 @@ class World:
             object.think()
 
         self.event_emitter.emit("after_tick")
+
+    def get_time(self):
+        return self.start_time - datetime.datetime.now()

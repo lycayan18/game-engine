@@ -7,6 +7,9 @@ class Vector3:
         self.y = y
         self.z = z
 
+    def calculate_distance(self, another):
+        return sqrt((self.x - another.x)**2 + (self.y - another.y)**2 + (self.z - another.z)**2)
+
     def length(self):
         return sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
