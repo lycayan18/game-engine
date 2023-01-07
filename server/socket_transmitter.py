@@ -43,5 +43,4 @@ class SocketTransmitter:
     def send_data(connection: socket.socket, data: str):
         # we receive the client's data (connection)
         # and send a response based on this data
-        connection = connection
         connection.send(data.encode('utf-8'))

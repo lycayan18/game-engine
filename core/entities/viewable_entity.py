@@ -8,13 +8,12 @@ class ViewableEntity(Entity):
                  rotation: Vector3 = None, scale: Vector3 = None):
 
         position = position or Vector3(0, 0, 0)
-        rotation = rotation or Vector3(0, 0, 0)
-        scale = scale or Vector3(1, 1, 1)
-
         super().__init__(position, class_name)
+
+        self.rotation = rotation or Vector3(0, 0, 0)
+        self.scale = scale or Vector3(1, 1, 1)
+
         self.mesh = mesh
-        self.rotation = rotation
-        self.scale = scale
 
     def set_mesh(self, mesh: Mesh):
         self.mesh = mesh

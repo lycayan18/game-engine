@@ -7,6 +7,11 @@ class Entity:
         self.class_name = class_name
         self.id = 0
 
+        self.deleted = False
+
+    def delete(self):
+        self.deleted = True
+
     def set_position(self, position: Vector3):
         self.position = position
 

@@ -23,3 +23,6 @@ class Transporter:
     def handle_server_response(self, response_data: str):
         data = json.loads(response_data)
         self.callbacks[data['id']](data['out'])
+
+    def run(self):
+        self.transmitter.run()

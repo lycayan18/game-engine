@@ -10,12 +10,10 @@ class Bullet(ViewableEntity):
         self.max_distance = max_distance
         self.speed = speed
 
-        self.alive = True
-
     def calculate_distance(self):
         distance = self.start_position.calculate_distance(self.position)
         if distance > self.max_distance:
-            self.alive = False
+            self.delete()
 
     def move(self):
         ...

@@ -134,6 +134,10 @@ class World:
         self.event_emitter.emit("before_tick")
 
         for entity in self.entities:
+            if entity.deleted:
+                self.remove_entity(entity)
+                continue
+
             entity.think()
 
         for object in self.map_objects:

@@ -1,5 +1,4 @@
 import socket
-import json
 from typing import Callable
 from core.utils.event_emitter import EventEmitter
 
@@ -18,12 +17,15 @@ class Transmitter:
 
     def get_data(self):
         try:
-            data = json.loads(self.sock.recv(2 ** 32).decode('utf-8'))
+            data = self.sock.recv(2 ** 32).decode('utf-8')
             self.event_emitter.emit('response', data)
         except InterruptedError:
             print('Transmitter: the data receiving was interrupted')
-        except Exception:
-            print('Transmitter: Invalid data')
+        except Exception as e:
+            print('Transmitter: an error has occurred:', e)
+
+    def run(self):
+        self.get_data()
 
     def close(self):
         self.sock.close()

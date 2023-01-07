@@ -1,23 +1,25 @@
 import json
 from server.socket_transmitter import SocketTransmitter
+from core.utils.event_emitter import EventEmitter
 
 
 class ServerTransporter:
-    def __init__(self, transmitter: SocketTransmitter, world):
+    def __init__(self, transmitter: SocketTransmitter):
         self.transmitter = transmitter
-        self.world = world
+        self.event_emitter = EventEmitter()
         self.transmitter.on('request', self.handle_request)
 
-    def send_data(self, data_id: str, send_state):
-        state = self.world.get_state()
+    def send_data(self, data_id: str, response: dict | str, send_response):
         data = {
             'id': data_id,
-            'out': state
+            'out': response
         }
         response = json.dumps(data)
-        send_state(response)
+        send_response(response)
 
-    def handle_request(self, request: str, send_state):
+    def handle_request(self, request: str, send_response):
         data = json.loads(request)
-        if data['request'] == 'get_state':
-            self.send_data(data['id'], send_state)
+        self.event_emitter.emit('request', data, lambda res: self.send_data(data['id'], res, send_response))
+
+    def run(self):
+        self.transmitter.run()

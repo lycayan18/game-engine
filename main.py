@@ -71,8 +71,8 @@ while True:
     if keys[pygame.key.key_code('q')]:
         camera.look_at(entity.position)
     else:
-        camera.rotation.y = mouse_pos[0] / 3840 * pi * 2 - pi
-        camera.rotation.x = mouse_pos[1] / 2160 * pi * 2 - pi
+        camera.rotation.y = mouse_pos[0] / 1920 * pi * 2 - pi
+        camera.rotation.x = mouse_pos[1] / 1080 * pi * 2 - pi
 
     forward = glm.vec3(0.0, 0.0, 1.0)
 
