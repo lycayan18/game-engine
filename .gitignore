@@ -6,3 +6,4 @@
 /pythree/build/
 /*.pyd
 /*.so
+/example.py

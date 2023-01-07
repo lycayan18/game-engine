@@ -17,7 +17,8 @@ class Weapon:
 
         self.last_recharge_time = self.world.get_time()
 
-    def shoot(self, *args, **kwargs):  # This method will be canceled by the heirs
+    def shoot(self, *args, **kwargs):
+        # Child classes should realise this functionality
         pass
 
     def set_bullet_count(self, count):

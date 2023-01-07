@@ -11,7 +11,11 @@ class Planet(MapObject):
 
     def calculate_gravity(self, star_ship: StarShip):
         distance = self.position.calculate_distance(star_ship.position)
-        force = 6.67 * 10**-6 * self.weight * star_ship.weight / distance**2 # ?????
+
+        # Newton's formula of universal gravitation
+        # 6.67 * 10**-6 - gravitanional constant
+        force = 6.67 * 10**-6 * self.weight * star_ship.weight / distance**2
+
         return force
 
     def set_state(self, state: dict):

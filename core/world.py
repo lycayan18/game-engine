@@ -81,6 +81,28 @@ class World:
 
         return state
 
+    def get_last_events(self) -> list[dict]:
+        events: list[dict] = []
+
+        for entity in self.entities:
+            events.append({
+                "target": entity.id,
+                "events": entity.get_last_events()
+            })
+
+        return events
+
+    def emit_events(self, events: list[dict]):
+        for event_list_descriptor in events:
+            target = event_list_descriptor["target"]
+            events = event_list_descriptor["events"]
+
+            entity = self.get_entity_by_id(target)
+
+            # By some reason we may not find the target entity, so check for that
+            if entity is not None:
+                entity.emit_events(events)
+
     def get_entity_by_id(self, id: int) -> Entity:
         for entity in self.entities:
             if entity.id == id:
