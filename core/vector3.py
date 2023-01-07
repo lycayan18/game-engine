@@ -4,8 +4,8 @@ from math import hypot
 class Vector3:
     def __init__(self, x: float, y: float = None, z: float = None):
         self.x = x
-        self.y = y or self.x
-        self.z = z or self.y
+        self.y = y if y is not None else self.x
+        self.z = z if z is not None else self.y
 
     def length(self):
         return hypot(self.x, self.y, self.z)

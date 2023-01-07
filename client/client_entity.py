@@ -2,17 +2,25 @@ from core.entities.viewable_entity import ViewableEntity
 from core.entity import Entity
 from core.vector3 import Vector3
 from core.mesh import Mesh
+from client.base_material import BaseMaterial
+from client.materials.default import DefaultMaterial
 
 
 class ClientEntity(ViewableEntity):
-    def __init__(self, entity: Entity, class_name: str, mesh: Mesh = None,
+    def __init__(self, entity: Entity, class_name: str, material: BaseMaterial, mesh: Mesh = None,
                  rotation: Vector3 = None, scale: Vector3 = None):
 
         rotation = rotation or Vector3(0, 0, 0)
         scale = scale or Vector3(1, 1, 1)
 
         super().__init__(class_name, entity.position, mesh, rotation, scale)
+
+        self.material = material
+
         self.entity = entity
+
+    def get_material(self):
+        return self.material
 
     def get_state(self) -> dict:
         state = {

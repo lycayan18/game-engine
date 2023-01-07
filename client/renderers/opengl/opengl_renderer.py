@@ -1,43 +1,25 @@
+import struct
 import ctypes
 import glm
 from OpenGL.GL import *
-from core.entities.viewable_entity import ViewableEntity
 from core.mesh import Mesh
 from core.module import BaseModule
 from core.utils.event_emitter import EventEmitter
 from core.world import World
+from client.client_entity import ClientEntity
 from client.graphics_module import GraphicsModule
 from client.camera import Camera
-
-BASE_VERTEX_SHADER = """
-#version 100
-precision highp float;
-attribute vec3 position;
-uniform mat4 projectionMatrix;
-uniform mat4 worldViewMatrix;
-
-void main(){
-    gl_Position = projectionMatrix * (worldViewMatrix * vec4(position, 1.));
-}
-"""
-BASE_FRAGMENT_SHADER = """
-#version 100
-precision highp float;
-
-void main() {
-    gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
-}
-"""
+from client.base_material import BaseMaterial
 
 
 class OpenGLRenderer(GraphicsModule):
     def __init__(self, width: int, height: int, camera: Camera):
         super(OpenGLRenderer, self).__init__(camera)
 
-        self.program = None
         self.buffer_mesh_pairs = []
         self.width = width
         self.height = height
+        self.shaders: dict = {}
 
         self.init_gl()
 
@@ -46,18 +28,27 @@ class OpenGLRenderer(GraphicsModule):
 
         event_emitter.on("new_mesh", self.handle_new_mesh)
         event_emitter.on("tick", self.draw)
+        event_emitter.on("material_registered", self.register_material)
 
     def init_gl(self):
-        program = self.create_shader(BASE_VERTEX_SHADER, BASE_FRAGMENT_SHADER)
-
-        self.program = program
-
-        glUseProgram(program)
-
         vao = GLuint(0)
 
         glGenVertexArrays(1, vao)
         glBindVertexArray(vao.value)
+
+        glEnable(GL_DEPTH_TEST)
+        glDepthFunc(GL_LEQUAL)
+
+    def register_material(self, material: BaseMaterial):
+        name = material.get_name()
+
+        if name in self.shaders:
+            return
+
+        shader = self.create_shader(
+            material.get_vertex_source(), material.get_fragment_source())
+
+        self.shaders[name] = shader
 
     def create_shader(self, vertex_source: str, fragment_source: str):
         vertex = glCreateShader(GL_VERTEX_SHADER)
@@ -116,10 +107,8 @@ class OpenGLRenderer(GraphicsModule):
 
     def draw(self):
         glClearColor(0.0, 0.0, 0.3, 1.0)
-        glClear(GL_COLOR_BUFFER_BIT)
-
-        if self.program is None:
-            return
+        glClearDepth(1.0)
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         projection_matrix = glm.perspective(
             glm.radians(90), self.width / self.height, 0.1, 100.0)
@@ -157,21 +146,35 @@ class OpenGLRenderer(GraphicsModule):
         ))
 
         for entity in self.world.entities:
-            if isinstance(entity, ViewableEntity):
+            if isinstance(entity, ClientEntity):
                 # *************************************************
                 # * Generate matrices
                 # *************************************************
 
-                glUseProgram(self.program)
+                material = entity.get_material()
+                program = self.shaders[material.get_name()]
+
+                # print(program)
+
+                glUseProgram(program)
 
                 position_location = glGetAttribLocation(
-                    self.program, "position")
+                    program, "position")
+
+                normal_location = glGetAttribLocation(
+                    program, "normal")
+
+                uv_location = glGetAttribLocation(
+                    program, "uv")
+
                 projection_matrix_location = glGetUniformLocation(
-                    self.program, "projectionMatrix")
+                    program, "projectionMatrix")
+
                 world_view_matrix_location = glGetUniformLocation(
-                    self.program, "worldViewMatrix")
+                    program, "worldViewMatrix")
+
                 model_view_matrix_location = glGetUniformLocation(
-                    self.program, "modelViewMatrix")
+                    program, "modelViewMatrix")
 
                 glUniformMatrix4fv(projection_matrix_location,
                                    1, False, projection_matrix.to_bytes())
@@ -213,31 +216,86 @@ class OpenGLRenderer(GraphicsModule):
                                    1, False, model_view_matrix.to_bytes())
 
                 # *************************************************
+                # * Setup material uniforms
+                # *************************************************
+
+                for uniform in material.get_uniforms():
+                    location = glGetUniformLocation(program, uniform["name"])
+
+                    self.set_uniform_value(
+                        location, uniform["value"], uniform["type"])
+
+                # *************************************************
                 # * Draw entity
                 # *************************************************
 
                 # Search buffer
-                for buffer, mesh in self.buffer_mesh_pairs:
+                for vertex_buffer, normals_buffer, uvs_buffer, mesh in self.buffer_mesh_pairs:
                     if mesh == entity.mesh:
-                        glBindBuffer(GL_ARRAY_BUFFER, buffer)
+                        if normal_location > -1:
+                            glBindBuffer(GL_ARRAY_BUFFER, normals_buffer)
+                            glVertexAttribPointer(
+                                normal_location, 3, GL_FLOAT, True, 0, ctypes.c_void_p(0))
+                            glEnableVertexAttribArray(normal_location)
+
+                        if uv_location > -1:
+                            glBindBuffer(GL_ARRAY_BUFFER, uvs_buffer)
+                            glVertexAttribPointer(
+                                uv_location, 2, GL_FLOAT, True, 0, ctypes.c_void_p(0))
+                            glEnableVertexAttribArray(uv_location)
+
+                        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+                        glEnableVertexAttribArray(position_location)
+                        glVertexAttribPointer(
+                            position_location, 3, GL_FLOAT, False, 0, ctypes.c_void_p(0))
                         break
 
-                glEnableVertexAttribArray(position_location)
-                glVertexAttribPointer(
-                    position_location, 3, GL_FLOAT, False, 0, ctypes.c_void_p(0))
                 glDrawArrays(GL_TRIANGLES, 0, int(len(
                     entity.mesh.geometry.get_vertices()) / 3))
 
+    def set_uniform_value(self, location, value, type: str):
+        if type in ["1f", "1fv"]:
+            glUniform1f(location, value)
+        elif type in ["2f", "2fv"]:
+            glUniform2fv(location, 1, value)
+        elif type in ["3f", "3fv"]:
+            glUniform3fv(location, 1, value)
+        elif type in ["4f", "4fv"]:
+            glUniform4fv(location, 1, value)
+        elif type in ["i1", "i1v"]:
+            glUniform1i(location, value)
+        elif type in ["i2", "i2v"]:
+            glUniform2iv(location, 1, value)
+        elif type in ["i3", "i3v"]:
+            glUniform3iv(location, 1, value)
+        elif type in ["i4", "i4v"]:
+            glUniform4iv(location, 1, value)
+        elif type == "mat2":
+            glUniformMatrix2fv(location, False, value)
+        elif type == "mat3":
+            glUniformMatrix3fv(location, False, value)
+        elif type == "mat4":
+            glUniformMatrix4fv(location, False, value)
+        elif type == "texture2D":
+            pass
+
     def handle_new_mesh(self, mesh: Mesh):
         vertex_data = mesh.geometry.get_vertices_as_bytes()
+        normals_data = mesh.geometry.get_normals_as_bytes()
+        uvs_data = mesh.geometry.get_uvs_as_bytes()
 
-        vertex_buffer = glGenBuffers(1)
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+        vertex_buffer = self.generate_array_buffer(vertex_data)
+        normals_buffer = self.generate_array_buffer(normals_data)
+        uvs_buffer = self.generate_array_buffer(uvs_data)
 
-        print(vertex_data)
-        print(len(vertex_data))
+        self.buffer_mesh_pairs.append(
+            (vertex_buffer, normals_buffer, uvs_buffer, mesh))
 
-        glBufferData(GL_ARRAY_BUFFER, len(vertex_data),
-                     vertex_data, GL_DYNAMIC_DRAW)
+    def generate_array_buffer(self, data: bytes):
+        buffer = glGenBuffers(1)
 
-        self.buffer_mesh_pairs.append((vertex_buffer, mesh))
+        glBindBuffer(GL_ARRAY_BUFFER, buffer)
+
+        glBufferData(GL_ARRAY_BUFFER, len(data), data, GL_DYNAMIC_DRAW)
+
+        return buffer
