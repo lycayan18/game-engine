@@ -16,6 +16,8 @@ from client.materials.textured import TexturedMaterial
 from client.texture2d import Texture2D
 from client.renderers.opengl.opengl_renderer import OpenGLRenderer
 from client.client_engine import ClientEngine
+from game.lib.mesh_generator.box import generate_box
+from game.lib.mesh_generator.sphere import generate_sphere
 from OpenGL.GL import *
 import glm
 
@@ -42,15 +44,7 @@ renderer = OpenGLRenderer(800, 600, Camera())
 engine.add_module(renderer)
 
 # Setup scene
-triangle = pythree.Geometry([
-    -1.0, 0.0, -0.5,
-    0.0, 0.0,   0.5,
-    1.0, 0.0,  -0.5
-], uvs=[
-    0.0, 0.0,
-    0.0, 1.0,
-    1.0, 0.0
-])
+box = generate_sphere(1.0, 48, 24)
 
 triangle2 = pythree.Geometry([
     -1.0, 0.0, -0.5,
@@ -62,13 +56,18 @@ triangle2 = pythree.Geometry([
     0.0, 1.0, 0.0
 ])
 
-entity = Entity(Vector3(0.0, -4.0, 0.0), "ent_test")
+entity = Entity(Vector3(0.0, 2.0, 0.0), "ent_test")
 entity2 = Entity(Vector3(0.0, 0.0, 0.0), "ent_test2")
 
+diffused_material = DiffuseMaterial(
+    engine, Vector3.normalized(Vector3(0.0, -1.0, 0.0)), [1.0, 1.0, 1.0])
+
+textured_material = TexturedMaterial(engine, texture=Texture2D(
+    0, 0, engine).load_from_file("./texture.png"))
+
 client_entity = ClientEntity(entity, "client_ent_test",
-                             TexturedMaterial(engine, texture=Texture2D(
-                                 0, 0, engine).load_from_file("./texture.png")),
-                             Mesh(triangle, engine), rotation=Vector3(0, 0.00, 0))
+                             diffused_material,
+                             Mesh(box, engine), rotation=Vector3(0, 0.00, 0))
 client_entity2 = ClientEntity(entity2, "client_ent_test2", DefaultMaterial(
     engine), Mesh(triangle2, engine), rotation=Vector3(0, 0.00, 0), scale=Vector3(10))
 
@@ -80,10 +79,10 @@ frame = 0
 while True:
     engine.tick()
 
-    entity.position.y = sin(frame / 60 * 2 * pi) + 1.0
-    client_entity.rotation.x += 120.0 / 60.0 * pi / 180.0
-    client_entity.rotation.y += 60.0 / 60.0 * pi / 180.0
-    client_entity.rotation.z += 30.0 / 60.0 * pi / 180.0
+    # entity.position.y = sin(frame / 60 * 2 * pi) + 1.0
+    # client_entity.rotation.x += 120.0 / 60.0 * pi / 180.0
+    # client_entity.rotation.y += 60.0 / 60.0 * pi / 180.0
+    # client_entity.rotation.z += 30.0 / 60.0 * pi / 180.0
 
     mouse_pos = pygame.mouse.get_pos()
 

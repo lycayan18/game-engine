@@ -29,7 +29,7 @@ uniform vec3 sunDirection;
 varying vec3 vNormal;
 
 void main() {
-    float diffuse = max(0.0, dot(vNormal, sunDirection));
+    float diffuse = max(0.0, dot(vNormal, -sunDirection));
 
     gl_FragColor = vec4(color * diffuse, 1.0);
 }
