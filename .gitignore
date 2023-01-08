@@ -8,3 +8,5 @@
 /*.so
 /example.py
 **/*.png
+**/*.glb
+**/*.wav
