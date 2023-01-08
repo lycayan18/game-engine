@@ -8,13 +8,16 @@ class HealthyEntity(Entity):
         self.health = health
         self.alive = True
 
+    def dead(self):
+        self.alive = False
+
     def heal(self, amount_health: float):
         self.health += amount_health
 
     def damage(self, amount_damage: float):
         self.health -= amount_damage
         if self.health <= 0:
-            self.alive = False
+            self.dead()
 
     def set_state(self, state: dict):
         super(HealthyEntity, self).set_state(state)
