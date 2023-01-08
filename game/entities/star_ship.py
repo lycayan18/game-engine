@@ -8,7 +8,6 @@ class StarShip(Player):
         super(StarShip, self).__init__(*args, **kwargs)
         self.weapon = weapon
         self.weight = weight
-        self.register_events = True
         self.rotation = rotation or Vector3(0, 0, 0)
 
     def set_weapon(self, weapon: Weapon):
@@ -22,15 +21,14 @@ class StarShip(Player):
         For shooting call "shoot" function, this function is for other purposes.
         """
 
-        if self.register_events:
-            self.push_event({
-                "type": "weapon_shoot",
-                "position": {
-                    "x": position.x,
-                    "y": position.y,
-                    "z": position.z
-                }
-            })
+        self.push_event({
+            "type": "weapon_shoot",
+            "position": {
+                "x": position.x,
+                "y": position.y,
+                "z": position.z
+            }
+        })
 
         self.weapon.shoot(current_position=position)
 
@@ -56,22 +54,21 @@ class StarShip(Player):
 
         return state
 
-    def stop_registering_events(self):
-        self.register_events = False
-
-    def start_registering_events(self):
-        self.register_events = True
-
     def emit_events(self, events: list[dict]):
         for event in events:
             if event.get("type", None) == "weapon_shoot":
-                # Stop registering events to avoid registering event that we're emitting now.
-                # Otherwise it may break game logic as World expects that Entity won't register
-                # events it's currently emitting
-                self.stop_registering_events()
+                # To avoid enabling event registering when it was disabled
+                currently_registering_events = self.register_events
+
+                if currently_registering_events:
+                    # Stop registering events to avoid registering event that we're emitting now.
+                    # Otherwise it may break game logic as World expects that Entity won't register
+                    # events it's currently emitting
+                    self.stop_registering_events()
 
                 self.shoot_event(Vector3(**event["position"]))
 
-                self.start_registering_events()
+                if currently_registering_events:
+                    self.start_registering_events()
 
         return super().emit_events(events)
