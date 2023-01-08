@@ -23,6 +23,15 @@ class ClientEngine(Engine):
 
         self.event_emitter.emit("material_registered", material)
 
+    def register_texture(self, texture):
+        """
+        Reports to all modules about new registered texture.
+        Useful for abstracting out from what these modules are and reporting regardless
+        of their purposes.
+        """
+
+        self.event_emitter.emit("texture_registered", texture)
+
     def handle_response(self, data: dict):
         self.world.set_state(data)
 

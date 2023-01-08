@@ -12,6 +12,8 @@ from client.client_entity import ClientEntity
 from client.camera import Camera
 from client.materials.default import DefaultMaterial
 from client.materials.diffuse import DiffuseMaterial
+from client.materials.textured import TexturedMaterial
+from client.texture2d import Texture2D
 from client.renderers.opengl.opengl_renderer import OpenGLRenderer
 from client.client_engine import ClientEngine
 from OpenGL.GL import *
@@ -44,10 +46,10 @@ triangle = pythree.Geometry([
     -1.0, 0.0, -0.5,
     0.0, 0.0,   0.5,
     1.0, 0.0,  -0.5
-], normals=[
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0,
-    0.0, 1.0, 0.0
+], uvs=[
+    0.0, 0.0,
+    0.0, 1.0,
+    1.0, 0.0
 ])
 
 triangle2 = pythree.Geometry([
@@ -64,8 +66,8 @@ entity = Entity(Vector3(0.0, -4.0, 0.0), "ent_test")
 entity2 = Entity(Vector3(0.0, 0.0, 0.0), "ent_test2")
 
 client_entity = ClientEntity(entity, "client_ent_test",
-                             DiffuseMaterial(engine, sun_direction=Vector3(
-                                 0.0, -1.0, 0.0), color=[1.0, 0.0, 1.0]),
+                             TexturedMaterial(engine, texture=Texture2D(
+                                 0, 0, engine).load_from_file("./texture.png")),
                              Mesh(triangle, engine), rotation=Vector3(0, 0.00, 0))
 client_entity2 = ClientEntity(entity2, "client_ent_test2", DefaultMaterial(
     engine), Mesh(triangle2, engine), rotation=Vector3(0, 0.00, 0), scale=Vector3(10))

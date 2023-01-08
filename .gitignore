@@ -7,3 +7,4 @@
 /*.pyd
 /*.so
 /example.py
+**/*.png

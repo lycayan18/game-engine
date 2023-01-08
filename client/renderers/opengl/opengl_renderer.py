@@ -10,6 +10,7 @@ from client.client_entity import ClientEntity
 from client.graphics_module import GraphicsModule
 from client.camera import Camera
 from client.base_material import BaseMaterial
+from client.texture2d import Texture2D
 
 
 class OpenGLRenderer(GraphicsModule):
@@ -20,6 +21,7 @@ class OpenGLRenderer(GraphicsModule):
         self.width = width
         self.height = height
         self.shaders: dict = {}
+        self.textures: list[dict] = []
 
         self.init_gl()
 
@@ -29,6 +31,7 @@ class OpenGLRenderer(GraphicsModule):
         event_emitter.on("new_mesh", self.handle_new_mesh)
         event_emitter.on("tick", self.draw)
         event_emitter.on("material_registered", self.register_material)
+        event_emitter.on("texture_registered", self.register_texture)
 
     def init_gl(self):
         vao = GLuint(0)
@@ -49,6 +52,30 @@ class OpenGLRenderer(GraphicsModule):
             material.get_vertex_source(), material.get_fragment_source())
 
         self.shaders[name] = shader
+
+    def register_texture(self, texture: Texture2D):
+        buffer = glGenTextures(1)
+
+        glBindTexture(GL_TEXTURE_2D, buffer)
+
+        data = texture.get_data()
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *texture.get_size(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE)
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                        GL_LINEAR_MIPMAP_NEAREST)
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+        glGenerateMipmap(GL_TEXTURE_2D)
+
+        self.textures.append({
+            "texture": texture,
+            "buffer": buffer
+        })
 
     def create_shader(self, vertex_source: str, fragment_source: str):
         vertex = glCreateShader(GL_VERTEX_SHADER)
@@ -219,11 +246,13 @@ class OpenGLRenderer(GraphicsModule):
                 # * Setup material uniforms
                 # *************************************************
 
+                active_texture = 0
+
                 for uniform in material.get_uniforms():
                     location = glGetUniformLocation(program, uniform["name"])
 
-                    self.set_uniform_value(
-                        location, uniform["value"], uniform["type"])
+                    active_texture = self.set_uniform_value(
+                        location, uniform["value"], uniform["type"], active_texture)
 
                 # *************************************************
                 # * Draw entity
@@ -253,7 +282,7 @@ class OpenGLRenderer(GraphicsModule):
                 glDrawArrays(GL_TRIANGLES, 0, int(len(
                     entity.mesh.geometry.get_vertices()) / 3))
 
-    def set_uniform_value(self, location, value, type: str):
+    def set_uniform_value(self, location, value, type: str, active_texture: int = 0):
         if type in ["1f", "1fv"]:
             glUniform1f(location, value)
         elif type in ["2f", "2fv"]:
@@ -277,7 +306,20 @@ class OpenGLRenderer(GraphicsModule):
         elif type == "mat4":
             glUniformMatrix4fv(location, False, value)
         elif type == "texture2D":
-            pass
+            glActiveTexture(GL_TEXTURE0 + active_texture)
+
+            for texture in self.textures:
+                # Comparing links
+                if texture["texture"] == value:
+                    glBindTexture(GL_TEXTURE_2D, texture["buffer"])
+                    break
+
+            glUniform1i(location, active_texture)
+
+            return active_texture + 1
+
+        # Returns current active texture in case we have two or more textures at the same time
+        return active_texture
 
     def handle_new_mesh(self, mesh: Mesh):
         vertex_data = mesh.geometry.get_vertices_as_bytes()
