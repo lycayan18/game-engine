@@ -18,6 +18,7 @@ from client.renderers.opengl.opengl_renderer import OpenGLRenderer
 from client.client_engine import ClientEngine
 from game.lib.mesh_generator.box import generate_box
 from game.lib.mesh_generator.sphere import generate_sphere
+from game.lib.collision_detection.shapes.box import Box
 from OpenGL.GL import *
 import glm
 
@@ -44,7 +45,7 @@ renderer = OpenGLRenderer(800, 600, Camera())
 engine.add_module(renderer)
 
 # Setup scene
-box = generate_sphere(1.0, 48, 24)
+box = generate_box(Vector3(0.5, 0.5, 2.0))
 
 triangle2 = pythree.Geometry([
     -1.0, 0.0, -0.5,
@@ -76,13 +77,20 @@ world.add_entity(client_entity2)
 
 frame = 0
 
+box = Box(Vector3(0.5, 0.5, 2), entity.position, client_entity.rotation)
+
 while True:
     engine.tick()
 
     # entity.position.y = sin(frame / 60 * 2 * pi) + 1.0
-    # client_entity.rotation.x += 120.0 / 60.0 * pi / 180.0
-    # client_entity.rotation.y += 60.0 / 60.0 * pi / 180.0
-    # client_entity.rotation.z += 30.0 / 60.0 * pi / 180.0
+    client_entity.rotation.x = 1.0 * 60.0 * 120.0 / 60.0 * pi / 180.0
+    client_entity.rotation.y = 1.0 * 60.0 * 60.0 / 60.0 * pi / 180.0
+    client_entity.rotation.z = 1.0 * 60.0 * 30.0 / 60.0 * pi / 180.0
+
+    if box.collide_point(camera.position):
+        diffused_material.color = [1.0, 0.0, 0.0]
+    else:
+        diffused_material.color = [1.0, 1.0, 1.0]
 
     mouse_pos = pygame.mouse.get_pos()
 

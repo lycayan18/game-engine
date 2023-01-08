@@ -23,7 +23,7 @@ def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
 
     vertexes.append((0.0, 1.0, 0.0))
     vertex_normals.append((0.0, 1.0, 0.0))
-    vertex_uvs.append((1.0, 1.0))
+    vertex_uvs.append((0.0, 0.0))
 
     for i in range(n_stacks - 1):
         # Some magic formulas and lines of code...
@@ -38,11 +38,11 @@ def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
 
             vertexes.append((x, y, z))
             vertex_normals.append((x, y, z))
-            vertex_uvs.append((i / (n_stacks - 1), j / n_slices))
+            vertex_uvs.append((j / n_slices, (i + 1) / n_stacks))
 
     vertexes.append((0.0, -1.0, 0.0))
     vertex_normals.append((0.0, -1.0, 0.0))
-    vertex_uvs.append((0.0, 0.0))
+    vertex_uvs.append((0.0, 1.0))
 
     normals: list[float] = []
     uvs: list[float] = []
@@ -68,8 +68,11 @@ def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
         normals.extend(
             (*vertex_normals[-1], *vertex_normals[i2], *vertex_normals[i3]))
 
-        uvs.extend((*vertex_uvs[0], *vertex_uvs[i0], *vertex_uvs[i1]))
-        uvs.extend((*vertex_uvs[-1], *vertex_uvs[i2], *vertex_uvs[i3]))
+        # Magic line "(vertex_uvs[i1][0] + vertex_uvs[i0][0]) * 0.5" gives natural UV-sphere coordinates
+        uvs.extend((*((vertex_uvs[i1][0] + vertex_uvs[i0][0]) * 0.5, 0.0),
+                    *vertex_uvs[i0], *vertex_uvs[i1]))
+        uvs.extend((*((vertex_uvs[i2][1] + vertex_uvs[i3][1]) * 0.5, 1.0),
+                    *vertex_uvs[i2], *vertex_uvs[i3]))
 
     # Add other triangles
     for j in range(n_stacks - 2):

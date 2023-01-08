@@ -14,10 +14,10 @@ class Box(Shape):
                                 Vector3(-1), self.rotation)
 
         return (
-            local.x >= -self.size.x * 0.5 and
-            local.x <= self.size.x * 0.5 and
-            local.y >= -self.size.y * 0.5 and
-            local.y <= self.size.y * 0.5 and
-            local.z >= -self.size.z * 0.5 and
-            local.z <= self.size.z * 0.5
+            local.x >= -self.size.x and
+            local.x <= self.size.x and
+            local.y >= -self.size.y and
+            local.y <= self.size.y and
+            local.z >= -self.size.z and
+            local.z <= self.size.z
         )
