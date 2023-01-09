@@ -13,14 +13,20 @@ class ClientStarShip(ClientEntity):
         rotation = rotation or Vector3(0, 0, 0)
         scale = scale or Vector3(1, 1, 1)
 
-        star_ship = StarShip(weapon, 1000, rotation, class_name, position, 100.0)
-        super(ClientStarShip, self).__init__(star_ship, class_name, material, mesh, rotation, scale)
+        super(ClientStarShip, self).__init__(
+            StarShip(weapon, 1000, rotation, class_name, position, 100.0),
+            class_name, material, mesh, rotation, scale
+        )
 
     def play_shoot_sound(self):
-        ...
+        self.push_event({
+            "type": "shoot_sound"
+        })
 
     def dead_animation(self):
-        ...
+        self.push_event({
+            "type": "play_dead_animation"
+        })
 
     def dead(self):
         self.entity.dead()
@@ -30,4 +36,22 @@ class ClientStarShip(ClientEntity):
         self.entity.shoot()
         self.play_shoot_sound()
 
+    def emit_events(self, events: list[dict]):
+        self.entity.emit_events(events)
 
+        for event in events:
+            # To avoid enabling event registering when it was disabled
+            currently_registering_events = self.register_events
+
+            if currently_registering_events:
+                self.stop_registering_events()
+
+            if event.get("type", None) == "play_dead_animation":
+                self.dead_animation()
+            elif event.get("type", None) == "shoot_sound":
+                self.play_shoot_sound()
+
+            if currently_registering_events:
+                self.start_registering_events()
+
+        return super().emit_events(events)

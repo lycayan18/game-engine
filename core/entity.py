@@ -9,12 +9,19 @@ class Entity:
         self.last_events = []
 
         self.deleted = False
+        self.register_events = True
 
     def delete(self):
         self.deleted = True
 
     def set_position(self, position: Vector3):
         self.position = position
+
+    def stop_registering_events(self):
+        self.register_events = False
+
+    def start_registering_events(self):
+        self.register_events = True
 
     def get_position(self):
         return self.position
@@ -45,7 +52,8 @@ class Entity:
         Not useful for using outside the class methods, e.g. "rocket.push_event(...)" - this function is not about this case.
         """
 
-        self.last_events.append(event)
+        if self.register_events:
+            self.last_events.append(event)
 
     def get_last_events(self) -> list[dict]:
         # Copy the events list to avoid returning link to the list which have been already cleared

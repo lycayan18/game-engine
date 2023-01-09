@@ -20,7 +20,20 @@ class Vector3:
         return Vector3(self.x - another.x, self.y - another.y, self.z - another.z)
 
     def __truediv__(self, another):
-        return Vector3(self.x / another.x, self.y / another.y, self.z / another.z)
+        x = 0
+        y = 0
+        z = 0
+
+        if another.x != 0:
+            x = self.x / another.x
+
+        if another.y != 0:
+            y = self.y / another.y
+
+        if another.z != 0:
+            z = self.z / another.z
+
+        return Vector3(x, y, z)
 
     def __mul__(self, another):
         return Vector3(another.x * self.x, another.y * self.y, another.z * self.z)
@@ -34,6 +47,9 @@ class Vector3:
         self.x /= length
         self.y /= length
         self.z /= length
+
+    def dot(self, another):
+        return self.x * another.x + self.y * another.y + self.z * another.z
 
     @staticmethod
     def normalized(vec):
