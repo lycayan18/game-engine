@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Callable
 from core.world import World
 from core.engine import Engine
 from client.transmitter import Transmitter
@@ -35,5 +35,8 @@ class ClientEngine(Engine):
     def handle_response(self, data: dict):
         self.world.set_state(data)
 
-    def send_data(self, data: Union[dict, str]):
-        self.transporter.send(data, self.handle_response)
+    def send_command(self, command: str, parameters: dict, callback: Callable[[Union[dict, str]], None]):
+        self.transporter.send({
+            "command": command,
+            "parameters": parameters
+        }, callback)

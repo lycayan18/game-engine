@@ -1,17 +1,52 @@
 from core.entities.player import Player
 from game.entities.weapon import Weapon
 from core.vector3 import Vector3
+from game.lib.rotation_to_direction import rotation_to_direction
 
 
 class StarShip(Player):
-    def __init__(self, weapon: Weapon, weight=1000, rotation: Vector3 = None, *args, **kwargs):
+    def __init__(self, weapon: Weapon, speed: int = 300, weight: int = 1000, rotation: Vector3 = None, *args, **kwargs):
         super(StarShip, self).__init__(*args, **kwargs)
         self.weapon = weapon
+        self.speed = speed
         self.weight = weight
         self.rotation = rotation or Vector3(0, 0, 0)
 
+    def get_rotation(self):
+        return self.rotation
+
     def set_weapon(self, weapon: Weapon):
         self.weapon = weapon
+
+    def move(self):
+        direction = rotation_to_direction(self.rotation)
+        self.position += direction * self.speed
+        self.push_event({
+            "type": "star_ship_move",
+            "position": {
+                "x": self.position.x,
+                "y": self.position.y,
+                "z": self.position.z
+            }
+        })
+
+    def set_rotation(self, rotation: Vector3):
+        self.rotation = rotation
+        self.push_event({
+            'type': 'set_rotation',
+            'rotation': {
+                'x': rotation.x,
+                'y': rotation.y,
+                'z': rotation.z
+            }
+        })
+
+    def set_speed(self, speed: int):
+        self.speed = speed
+        self.push_event({
+            'type': 'set_speed',
+            'speed': self.speed
+        })
 
     def shoot_event(self, position: Vector3):
         """
