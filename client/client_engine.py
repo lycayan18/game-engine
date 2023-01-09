@@ -1,9 +1,10 @@
-from typing import Any, Callable, Union
-from core.world import World
-from core.engine import Engine
-from client.transmitter import Transmitter
-from client.transporter import Transporter
 from client.graphics_module import GraphicsModule
+from client.transporter import Transporter
+from client.transmitter import Transmitter
+from core.engine import Engine
+from core.world import World
+from typing import Union, Callable
+from typing import Any, Callable, Union
 
 
 class ClientEngine(Engine):

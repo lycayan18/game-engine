@@ -9,32 +9,39 @@ class Server(ServerEngine):
     def __init__(self, ip: str, port: int):
         super(Server, self).__init__(World(Registry()), ip, port)
 
+        self.last_events = []
+
+        self.event_emitter.on("pull_events", self.handle_pull_events_request)
+        self.event_emitter.on("push_events", self.handle_push_events_request)
+        self.event_emitter.on("shoot", self.handle_shoot_events_request)
+
     def handle_request(self, request: Union[dict[str, dict], dict, str], response: Callable):
         # проверка на обработку запроса ServerEngine'ом
         if super(Server, self).handle_request(request, response):
             return
 
+        self.event_emitter.emit(request["request"]["command"], response, **request["request"]["parameters"])
+
         if request['request']['command'] == 'shoot':
-            self.world.get_entity_by_id(request['request']['entity_id']).shoot()
+            self.world.get_entity_by_id(
+                request['request']['entity_id']).shoot()
 
-        if 'position_x' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).position.x = request['request']['position_x']
+        if request['request']['command'] == "pull_events":
+            response(self.last_events[:])
 
-        if 'position_y' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).position.x = request['request']['position_y']
+        if request['request']['command'] == 'push_events':
+            self.world.emit_events(request['request']['params'])
 
-        if 'position_z' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).position.x = request['request']['position_z']
+    def handle_pull_events_request(self, response, **params):
+        pass
 
-        if 'rotation_x' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).rotation.x = request['request']['rotation_x']
+    def handle_push_events_request(self, response, **params):
+        pass
 
-        if 'rotation_y' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).rotation.y = request['request']['rotation_y']
+    def handle_shoot_events_request(self, response, **params):
+        pass
 
-        if 'rotation_z' in request['request']:
-            self.world.get_entity_by_id(request['request']['entity_id']).rotation.z = request['request']['rotation_z']
+    def tick(self):
+        super().tick()
 
-
-
-
+        self.last_events = self.world.get_last_events()

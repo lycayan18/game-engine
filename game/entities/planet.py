@@ -2,6 +2,7 @@ from core.map_object import MapObject
 from core.world import World
 from game.entities.star_ship import StarShip
 from core.vector3 import Vector3
+from game.lib.collision_detection.shapes.sphere import Sphere
 
 
 class Planet(MapObject):
@@ -10,6 +11,8 @@ class Planet(MapObject):
         self.world = world
         self.weight = weight
         self.radius = radius
+
+        self.sphere = Sphere(self.radius, self.position)
 
     def calculate_gravity(self, star_ship: StarShip):
         distance = self.position.calculate_distance(star_ship.position)
@@ -41,3 +44,6 @@ class Planet(MapObject):
                 entity.position.x = entity.position.x - force if entity.position.x > self.position.x else entity.position.x + force
                 entity.position.y = entity.position.y - force if entity.position.y > self.position.y else entity.position.y + force
                 entity.position.z = entity.position.z - force if entity.position.z > self.position.z else entity.position.z + force
+
+                if self.sphere.collide_point(entity.get_position()):
+                    entity.dead()
