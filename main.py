@@ -116,9 +116,7 @@ while True:
     point = box.line_intersection(camera.position, camera.position + forward)
 
     if point is not None:
-        intersection.entity.position.x = point.x
-        intersection.entity.position.y = point.y
-        intersection.entity.position.z = point.z
+        intersection.set_position(point)
 
     left = glm.vec3(1.0, 0.0, 0.0)
 

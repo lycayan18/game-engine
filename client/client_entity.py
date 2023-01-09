@@ -22,6 +22,14 @@ class ClientEntity(ViewableEntity):
     def get_material(self):
         return self.material
 
+    def set_position(self, position: Vector3):
+        super(ClientEntity, self).set_position(position)
+
+        self.entity.set_position(position)
+
+    def get_position(self) -> Vector3:
+        return self.entity.get_position()
+
     def get_state(self) -> dict:
         state = {
             **super().get_state(),
