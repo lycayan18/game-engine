@@ -19,6 +19,7 @@ from client.client_engine import ClientEngine
 from game.lib.mesh_generator.box import generate_box
 from game.lib.mesh_generator.sphere import generate_sphere
 from game.lib.collision_detection.shapes.box import Box
+from game.lib.collision_detection.shapes.sphere import Sphere
 from OpenGL.GL import *
 import glm
 
@@ -46,6 +47,7 @@ engine.add_module(renderer)
 
 # Setup scene
 box = generate_box(Vector3(0.5, 0.5, 2.0))
+sphere = generate_sphere(1.0, 24, 12)
 
 triangle2 = pythree.Geometry([
     -1.0, 0.0, -0.5,
@@ -69,15 +71,19 @@ textured_material = TexturedMaterial(engine, texture=Texture2D(
 client_entity = ClientEntity(entity, "client_ent_test",
                              diffused_material,
                              Mesh(box, engine), rotation=Vector3(0, 0.00, 0))
+intersection = ClientEntity(Entity(Vector3(0.0, 2.0, 0.0), "ent_test3"), "client_ent_test3",
+                            diffused_material,
+                            Mesh(sphere, engine), scale=Vector3(0.1, 0.1, 0.1))
 client_entity2 = ClientEntity(entity2, "client_ent_test2", DefaultMaterial(
     engine), Mesh(triangle2, engine), rotation=Vector3(0, 0.00, 0), scale=Vector3(10))
 
 world.add_entity(client_entity)
 world.add_entity(client_entity2)
+world.add_entity(intersection)
 
 frame = 0
 
-box = Box(Vector3(0.5, 0.5, 2), entity.position, client_entity.rotation)
+box = Box(Vector3(0.5, 0.5, 2.0), entity.position, client_entity.rotation)
 
 while True:
     engine.tick()
@@ -85,12 +91,12 @@ while True:
     # entity.position.y = sin(frame / 60 * 2 * pi) + 1.0
     client_entity.rotation.x = 1.0 * 60.0 * 120.0 / 60.0 * pi / 180.0
     client_entity.rotation.y = 1.0 * 60.0 * 60.0 / 60.0 * pi / 180.0
-    client_entity.rotation.z = 1.0 * 60.0 * 30.0 / 60.0 * pi / 180.0
+    client_entity.rotation.z = 0.0 * 60.0 * 30.0 / 60.0 * pi / 180.0
 
-    if box.collide_point(camera.position):
-        diffused_material.color = [1.0, 0.0, 0.0]
-    else:
-        diffused_material.color = [1.0, 1.0, 1.0]
+    # if box.collide_point(camera.position):
+    #     diffused_material.color = [1.0, 0.0, 0.0]
+    # else:
+    #     diffused_material.color = [1.0, 1.0, 1.0]
 
     mouse_pos = pygame.mouse.get_pos()
 
@@ -106,6 +112,13 @@ while True:
                          glm.vec3(1.0, 0.0, 0.0))
     forward = glm.rotate(forward, camera.rotation.y,
                          glm.vec3(0.0, 1.0, 0.0))
+
+    point = box.line_intersection(camera.position, camera.position + forward)
+
+    if point is not None:
+        intersection.entity.position.x = point.x
+        intersection.entity.position.y = point.y
+        intersection.entity.position.z = point.z
 
     left = glm.vec3(1.0, 0.0, 0.0)
 
