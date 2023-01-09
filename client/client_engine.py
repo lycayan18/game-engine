@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Callable, Union
 from core.world import World
 from core.engine import Engine
 from client.transmitter import Transmitter
@@ -32,8 +32,19 @@ class ClientEngine(Engine):
 
         self.event_emitter.emit("texture_registered", texture)
 
-    def handle_response(self, data: dict):
-        self.world.set_state(data)
+    def send_world_state_request(self):
+        self.send_command("get_state", {}, self.world.set_state)
 
-    def send_data(self, data: Union[dict, str]):
-        self.transporter.send(data, self.handle_response)
+    def send_pull_events_request(self):
+        self.send_command("pull_events", {}, self.world.emit_events)
+
+    def send_events(self):
+        self.send_command("push_events",
+                          {"events": self.world.get_last_events()},
+                          None)
+
+    def send_command(self, command: str, parameters: dict, callback: Callable[[Any], None]):
+        self.transporter.send({
+            "command": command,
+            "parameters": parameters
+        }, callback)

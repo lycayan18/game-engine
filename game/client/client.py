@@ -7,45 +7,31 @@ class Client(ClientEngine):
     def __init__(self, world: World, ip: str, port: int):
         super(Client, self).__init__(world, ip, port)
 
-    def shoot(self, entity_id):
-        request = {
-            'entity_id': entity_id,
-            'command': 'shoot'}
-        self.send_data(request)
+        self.client_id = -1
+        self.current_entity_id = -1
 
-    def position_x(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'position_x': coord}
-        self.send_data(request)
+    def set_client_id(self, id: int):
+        self.client_id = id
 
-    def position_y(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'position_y': coord}
-        self.send_data(request)
+    def set_current_entity_id(self, id: int):
+        self.current_entity_id = id
 
-    def position_z(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'position_z': coord}
-        self.send_data(request)
+    def get_current_entity_id(self) -> int:
+        return self.current_entity_id
 
-    def rotation_x(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'rotation_x': coord}
-        self.send_data(request)
+    def request_client_id(self):
+        self.send_command("get_client_id", {}, self.set_client_id)
 
-    def rotation_y(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'rotation_y': coord}
-        self.send_data(request)
+    def request_current_entity_id(self):
+        """
+        Requests player's current entity id.\n
+        Note: ```request_client_id()``` must be called once before this method to authorize client.
+        """
 
-    def rotation_z(self, entity_id, coord):
-        request = {
-            'entity_id': entity_id,
-            'rotation_z': coord}
-        self.send_data(request)
+        # Check that we're authorized
+        if self.client_id == -1:
+            return
 
+        self.send_command("get_current_entity_id",
+                          {"client_id": self.client_id},
+                          self.set_current_entity_id)
