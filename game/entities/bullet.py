@@ -12,6 +12,7 @@ class Bullet(Entity):
 
         self.world = world
         self.start_position = start_position
+        self.prev_position = start_position
         self.rotation = rotation
         self.damage = damage
         self.max_distance = max_distance
@@ -23,6 +24,8 @@ class Bullet(Entity):
             self.delete()
 
     def move(self):
+        self.prev_position = self.position.copy()
+
         direction = rotation_to_direction(self.rotation)
         self.position += direction * self.speed
         self.push_event({
@@ -35,7 +38,7 @@ class Bullet(Entity):
         })
 
     def collision_check(self, star_ship: StarShip):
-        if star_ship.get_collision_model().line_intersection(self.start_position, self.position) is not None:
+        if star_ship.get_collision_model().line_intersection(self.prev_position, self.position) is not None:
             star_ship.damage(self.damage)
 
     def think(self):

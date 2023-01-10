@@ -7,6 +7,9 @@ class Vector3:
         self.y = y if y is not None else self.x
         self.z = z if z is not None else self.y
 
+    def copy(self):
+        return Vector3(self.x, self.y, self.z)
+
     def length(self):
         return hypot(self.x, self.y, self.z)
 
