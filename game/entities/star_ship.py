@@ -13,7 +13,8 @@ class StarShip(Player):
         self.weight = weight
         self.rotation = rotation or Vector3(0, 0, 0)
 
-        self.starship_bounding_box = Box(Vector3(1.214, 0.8, 2.0), self.get_position(), self.get_rotation())
+        self.starship_bounding_box = Box(
+            Vector3(1.214, 0.8, 2.0), self.get_position(), self.get_rotation())
 
     def get_collision_model(self) -> Box:
         return Box(Vector3(1.214, 0.8, 2.0), self.get_position(), self.get_rotation())
@@ -27,14 +28,6 @@ class StarShip(Player):
     def move(self):
         direction = rotation_to_direction(self.rotation)
         self.position += direction * self.speed
-        self.push_event({
-            "type": "star_ship_move",
-            "position": {
-                "x": self.position.x,
-                "y": self.position.y,
-                "z": self.position.z
-            }
-        })
 
     def set_rotation(self, rotation: Vector3):
         self.rotation = rotation
@@ -97,19 +90,23 @@ class StarShip(Player):
 
     def emit_events(self, events: list[dict]):
         for event in events:
+            # To avoid enabling event registering when it was disabled
+            currently_registering_events = self.register_events
+
+            if currently_registering_events:
+                # Stop registering events to avoid registering event that we're emitting now.
+                # Otherwise it may break game logic as World expects that Entity won't register
+                # events it's currently emitting
+                self.stop_registering_events()
+
             if event.get("type", None) == "weapon_shoot":
-                # To avoid enabling event registering when it was disabled
-                currently_registering_events = self.register_events
-
-                if currently_registering_events:
-                    # Stop registering events to avoid registering event that we're emitting now.
-                    # Otherwise it may break game logic as World expects that Entity won't register
-                    # events it's currently emitting
-                    self.stop_registering_events()
-
                 self.shoot_event(Vector3(**event["position"]))
+            elif event.get("type", None) == "set_speed":
+                self.set_speed(event["speed"])
+            elif event.get("type", None) == "set_rotation":
+                self.set_rotation(Vector3(event["rotation"]))
 
-                if currently_registering_events:
-                    self.start_registering_events()
+            if currently_registering_events:
+                self.start_registering_events()
 
         return super().emit_events(events)

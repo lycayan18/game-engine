@@ -18,8 +18,10 @@ class Server(ServerEngine):
 
         self.event_emitter.on("pull_events", self.handle_pull_events_request)
         self.event_emitter.on("push_events", self.handle_push_events_request)
-        self.event_emitter.on("get_client_id", self.handle_get_client_id_request)
-        self.event_emitter.on("get_current_entity_id", self.handle_get_current_entity_id_request)
+        self.event_emitter.on(
+            "get_client_id", self.handle_get_client_id_request)
+        self.event_emitter.on("get_current_entity_id",
+                              self.handle_get_current_entity_id_request)
 
         self.event_emitter.on("respawn", self.handle_respawn_request)
 
@@ -32,10 +34,12 @@ class Server(ServerEngine):
         if super(Server, self).handle_request(request, response):
             return
 
-        self.event_emitter.emit(request["request"]["command"], response, request["request"]["parameters"])
+        self.event_emitter.emit(
+            request["request"]["command"], response, request["request"]["parameters"])
 
     def handle_respawn_request(self, response: Callable, parameters: dict):
-        star_ship = generate_star_ship(self.world, parameters['id'])
+        star_ship = generate_star_ship(
+            self.world, self.clients_with_id[parameters['client_id']].id)
 
         self.world.remove_entity(self.clients_with_id[parameters['client_id']])
 
