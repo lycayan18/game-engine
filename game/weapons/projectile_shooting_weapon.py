@@ -1,5 +1,5 @@
 from core.vector3 import Vector3
-from game.entities.weapon import Weapon
+from game.weapons.weapon import Weapon
 from game.entities.bullet import Bullet
 
 
@@ -9,9 +9,10 @@ class ProjectileShootingWeapon(Weapon):
         self.bullet = bullet
         self.bullet_speed = bullet_speed
 
-    def shoot(self, current_position: Vector3):
+    def shoot(self, current_position: Vector3, rotation: Vector3):
         if self.bullet_count > 0 and self.current_bullets_in_clip > 0 and self.is_reloaded():
-            bullet = self.bullet(current_position, self.damage, self.max_distance, self.bullet_speed)
+            bullet = self.bullet(self.world, current_position, rotation, self.damage, self.max_distance,
+                                 self.bullet_speed)
 
             self.world.add_entity(bullet)
 

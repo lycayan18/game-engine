@@ -14,6 +14,9 @@ class Planet(MapObject):
 
         self.sphere = Sphere(self.radius, self.position)
 
+    def get_collision_model(self) -> Sphere:
+        return self.sphere
+
     def calculate_gravity(self, star_ship: StarShip):
         distance = self.position.calculate_distance(star_ship.position)
 

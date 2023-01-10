@@ -1,6 +1,7 @@
 from core.entities.player import Player
-from game.entities.weapon import Weapon
+from game.weapons.weapon import Weapon
 from core.vector3 import Vector3
+from game.lib.collision_detection.shapes.box import Box
 from game.lib.rotation_to_direction import rotation_to_direction
 
 
@@ -12,7 +13,12 @@ class StarShip(Player):
         self.weight = weight
         self.rotation = rotation or Vector3(0, 0, 0)
 
-    def get_rotation(self):
+        self.starship_bounding_box = Box(Vector3(1.214, 0.8, 2.0), self.get_position(), self.get_rotation())
+
+    def get_collision_model(self) -> Box:
+        return Box(Vector3(1.214, 0.8, 2.0), self.get_position(), self.get_rotation())
+
+    def get_rotation(self) -> Vector3:
         return self.rotation
 
     def set_weapon(self, weapon: Weapon):

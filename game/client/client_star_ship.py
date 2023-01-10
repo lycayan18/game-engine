@@ -3,7 +3,7 @@ from client.client_entity import ClientEntity
 from core.mesh import Mesh
 from core.vector3 import Vector3
 from game.entities.star_ship import StarShip
-from game.entities.weapon import Weapon
+from game.weapons.weapon import Weapon
 from game.app_state import AppState
 
 
