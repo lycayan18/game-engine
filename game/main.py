@@ -1,117 +1,138 @@
 import sys
 import pygame
-from math import *
-from core.mesh import Mesh
-from core.entities.viewable_entity import ViewableEntity
-from core.vector3 import Vector3
-import pythree
+from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule
+from game.app_state import AppState
+from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
 from client.renderers.opengl.opengl_renderer import OpenGLRenderer
-import glm
 from game.client.client import Client
 from core.world import World
 from core.registry import Registry
-from core.entity import Entity
+from game.utils.keyboard_control_manager import KeyboardControlManager
+
+controls_manager = KeyboardControlManager()
+
+# ********************************************************
+# *                    INITIALIZATION                    *
+# ********************************************************
 
 
-def main(ip: str, port: int):
-    registry = Registry()
-    registry.associate('ent_base', Entity)
-    client = Client(World(registry), ip, port)
-
-    clock = pygame.time.Clock()
+def init_modules(engine: Client):
+    # Init graphcis subsystem
 
     pygame.init()
     pygame.font.init()
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
-    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
-    pygame.display.gl_set_attribute(
-        pygame.GL_CONTEXT_PROFILE_MASK, pygame.GL_CONTEXT_PROFILE_CORE)
-    pygame.display.set_mode(
-        (1920, 1080), flags=pygame.OPENGL | pygame.DOUBLEBUF)
+    pygame.display.gl_get_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
+    pygame.display.gl_get_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK,
+                                    pygame.GL_CONTEXT_PROFILE_CORE)
+    pygame.display.set_mode(AppState.get_screen_resolution(),
+                            flags=pygame.OPENGL | pygame.DOUBLEBUF)
 
-    camera = Camera()
+    renderer = OpenGLRenderer(*AppState.get_screen_resolution(), Camera())
 
-    renderer = OpenGLRenderer(1920, 1080, Camera())
+    engine.add_module(renderer)
 
-    client.add_module(renderer)
+    # Init sound subsystem
 
-    triangle = pythree.Geometry([
-        -1.0, 0.0, -0.5,
-        0.0, 0.0, 0.5,
-        1.0, 0.0, -0.5
-    ])
-    triangle2 = pythree.Geometry([
-        -1.0, 0.0, -0.5,
-        0.0, 0.0, 0.5,
-        1.0, 0.0, -0.5
-    ])
+    pygame.mixer.init()
 
-    entity = ViewableEntity("ent_test", Vector3(
-        0.0, -4.0, 0.0), Mesh(triangle, client), rotation=Vector3(0, 0.00, 0))
+    sound_module = PygameSoundModule(renderer.get_camera())
 
-    entity2 = ViewableEntity("ent_test2", Vector3(
-        0.0, 0.0, 0.0), Mesh(triangle2, client), scale=Vector3(10, 10, 10), rotation=Vector3(0, 0.00, 0))
+    engine.add_module(sound_module)
 
-    client.world.add_entity(entity2)
-    client.world.add_entity(entity)
 
-    frame = 0
+# ********************************************************
+# *                       ROUTINES                       *
+# ********************************************************
+
+
+def update_all(world: World, engine: Client):
+    engine.request_current_entity_id()
+    engine.send_world_state_request()
+    engine.send_pull_events_request()
+    engine.send_events()
+
+    AppState.set_current_player_entity(
+        world.get_entity_by_id(engine.get_current_entity_id())
+    )
+
+
+def run_basic_routine():
+    """
+    Runs basic routines that MUST run every tick, such as checking for window close.
+    """
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+
+
+def wait_for_client_authorize(engine: Client):
+    """
+    Requests client id and waits till it gets it.
+    """
+
+    engine.request_client_id()
+
+    while not engine.is_authorized():
+        engine.tick()
+
+        # Let user at least close the window while waiting
+        run_basic_routine()
+
+
+def wait_for_current_player_entity(engine: Client):
+    """
+    Requests current player entity id and waits till it gets it.
+    """
+
+    engine.request_current_entity_id()
+
+    while engine.get_current_entity_id() == -1:
+        engine.tick()
+
+        # Let user at least close the window while waiting
+        run_basic_routine()
+
+
+def main(ip: str, port: int):
+    # *****************************
+    # * Initialize everything
+    # *****************************
+
+    # Initialize controls
+
+    controls_manager.bind_key(pygame.K_w, 'forward')
+    controls_manager.bind_key(pygame.K_s, 'backward')
+
+    # Initialize engine, world, modules, etc.
+
+    world = World(Registry(CLIENT_REGISTRY_ASSOCIATIONS))
+    engine = Client(world, ip, port)
+
+    AppState.set_world(world)
+
+    init_modules(engine)
+
+    wait_for_client_authorize(engine)
+    wait_for_current_player_entity(engine)
+
+    AppState.set_current_player_entity(
+        world.get_entity_by_id(engine.get_current_entity_id())
+    )
 
     while True:
-        client.tick()
+        engine.tick()
 
-        entity.position.y = sin(frame / 60 * 2 * pi) + 1.0
-        entity.rotation.x += 120.0 / 60.0 * pi / 180.0
-        entity.rotation.y += 60.0 / 60.0 * pi / 180.0
-        entity.rotation.z += 30.0 / 60.0 * pi / 180.0
-
-        mouse_pos = pygame.mouse.get_pos()
-
-        forward = glm.vec3(0.0, 0.0, 1.0)
-
-        forward = glm.rotate(forward, camera.rotation.x,
-                             glm.vec3(1.0, 0.0, 0.0))
-        forward = glm.rotate(forward, camera.rotation.y,
-                             glm.vec3(0.0, 1.0, 0.0))
-
-        left = glm.vec3(1.0, 0.0, 0.0)
-
-        left = glm.rotate(left, camera.rotation.y,
-                          glm.vec3(0.0, 1.0, 0.0))
+        update_all(engine)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_q:
-                    camera.look_at(entity.position)
-                else:
-                    camera.rotation.y = mouse_pos[0] / 1920 * pi * 2 - pi
-                    camera.rotation.x = mouse_pos[1] / 1080 * pi * 2 - pi
-
-                if event.key == pygame.K_w:
-                    camera.position.x += forward.x * 5.0 / 60.0
-                    camera.position.y += forward.y * 5.0 / 60.0
-                    camera.position.z += forward.z * 5.0 / 60.0
-
-                if event.key == pygame.K_s:
-                    camera.position.x -= forward.x * 5.0 / 60.0
-                    camera.position.y -= forward.y * 5.0 / 60.0
-                    camera.position.z -= forward.z * 5.0 / 60.0
-
-                if event.key == pygame.K_a:
-                    camera.position.x -= left.x * 5.0 / 60.0
-                    camera.position.z -= left.z * 5.0 / 60.0
-
-                if event.key == pygame.K_w:
-                    camera.position.x += left.x * 5.0 / 60.0
-                    camera.position.z += left.z * 5.0 / 60.0
-
-        pygame.display.flip()
-
-        clock.tick(60)
-
-        frame += 1
+                controls_manager.handle_key_down(event.key)
+            elif event.type == pygame.KEYUP:
+                controls_manager.handle_key_up(event.key)

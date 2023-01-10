@@ -1,4 +1,6 @@
 from core.utils.event_emitter import EventEmitter
+from core.entities.player import Player
+from core.world import World
 
 
 class AppState:
@@ -6,25 +8,59 @@ class AppState:
     Game state container class.\n
     Provides convenient interface to setup settings, watch settings values, etc.
     """
+    volume = 1.0
+    fps = 60.0
+    screen_resolution = (800, 600)
+    current_player_entity = None
+    world = None
+    event_emitter = EventEmitter()
 
-    def __init__(self):
-        self.event_emitter = EventEmitter()
+    @staticmethod
+    def set_world(world: World):
+        AppState.world = world
 
-        self.volume = 1.0
-        self.screen_resolution = (800, 600)
+        AppState.event_emitter.emit("world_changed", world)
 
-    def get_volume(self) -> float:
-        return self.volume
+    @staticmethod
+    def get_world() -> World:
+        return AppState.world
 
-    def get_screen_resolution(self) -> tuple[int]:
-        return self.screen_resolution
+    @staticmethod
+    def set_volume(value: float):
+        AppState.volume = value
 
-    def set_volume(self, value: float):
-        self.volume = value
+        AppState.event_emitter.emit("volume_changed", value)
 
-        self.event_emitter.emit("volume_changed", value)
+    @staticmethod
+    def get_volume() -> float:
+        return AppState.volume
 
-    def set_screen_resolution(self, width: int, height: int):
-        self.screen_resolution = (width, height)
+    @staticmethod
+    def set_fps(value: float):
+        AppState.fps = value
 
-        self.event_emitter.emit("resolution_changed", width, height)
+        AppState.event_emitter.emit("fps_changed", value)
+
+    @staticmethod
+    def get_fps() -> float:
+        return AppState.fps
+
+    @staticmethod
+    def set_screen_resolution(width: int, height: int):
+        AppState.screen_resolution = (width, height)
+
+        AppState.event_emitter.emit("resolution_changed", width, height)
+
+    @staticmethod
+    def get_screen_resolution() -> tuple[int]:
+        return AppState.screen_resolution
+
+    @staticmethod
+    def set_current_player_entity(entity: Player):
+        AppState.current_player_entity = entity
+
+        AppState.event_emitter.emit("current_player_entity_changed", entity)
+
+    @staticmethod
+    def get_current_player_entity() -> Player:
+        return AppState.current_player_entity

@@ -13,6 +13,9 @@ class Client(ClientEngine):
     def set_client_id(self, id: int):
         self.client_id = id
 
+    def is_authorized(self):
+        return self.client_id != -1
+
     def set_current_entity_id(self, id: int):
         self.current_entity_id = id
 

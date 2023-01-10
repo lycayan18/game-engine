@@ -59,3 +59,11 @@ class Weapon:
         self.current_bullets_in_clip = state.get('current_bullets_in_clip')
 
         self.max_distance = state.get('max_distance')
+
+    @staticmethod
+    def from_state(state: dict, world: World):
+        weapon = Weapon(world, 0.0, 0, 0, 0, 0.0)
+
+        weapon.set_state(state)
+
+        return weapon
