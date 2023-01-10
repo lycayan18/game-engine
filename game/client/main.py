@@ -1,7 +1,7 @@
 import sys
 import pygame
 from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule
-from game.app_state import AppState
+from game.client.app_state import AppState
 from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
 from client.renderers.opengl.opengl_renderer import OpenGLRenderer
@@ -9,6 +9,7 @@ from game.client.client import Client
 from core.world import World
 from core.registry import Registry
 from game.utils.keyboard_control_manager import KeyboardControlManager
+from game.client.load_assets import load_assets
 
 controls_manager = KeyboardControlManager()
 
@@ -47,15 +48,11 @@ def init_modules(engine: Client):
 # ********************************************************
 
 
-def update_all(world: World, engine: Client):
+def update_all(engine: Client):
     engine.request_current_entity_id()
     engine.send_world_state_request()
     engine.send_pull_events_request()
     engine.send_events()
-
-    AppState.set_current_player_entity(
-        world.get_entity_by_id(engine.get_current_entity_id())
-    )
 
 
 def run_basic_routine():
@@ -115,6 +112,8 @@ def main(ip: str, port: int):
     AppState.set_world(world)
 
     init_modules(engine)
+
+    load_assets()
 
     wait_for_client_authorize(engine)
     wait_for_current_player_entity(engine)

@@ -3,15 +3,16 @@ from client.client_entity import ClientEntity
 from core.mesh import Mesh
 from core.vector3 import Vector3
 from game.entities.star_ship import StarShip
-from game.weapons.weapon import Weapon
-from game.app_state import AppState
+from game.client.weapons.client_weapon import ClientWeapon
+from game.client.weapons.laser_gun import ClientLaserGun
+from game.client.app_state import AppState
 
 
 class ClientStarShip(ClientEntity):
     mesh = None
     material = None
 
-    def __init__(self, position: Vector3, weapon: Weapon, class_name: str, material: BaseMaterial, mesh: Mesh = None,
+    def __init__(self, position: Vector3, weapon: ClientWeapon, class_name: str, material: BaseMaterial, mesh: Mesh = None,
                  rotation: Vector3 = None, scale: Vector3 = None):
 
         rotation = rotation or Vector3(0, 0, 0)
@@ -21,11 +22,6 @@ class ClientStarShip(ClientEntity):
             StarShip(weapon, 1000, rotation, class_name, position, 100.0),
             class_name, material, mesh, rotation, scale
         )
-
-    def play_shoot_sound(self):
-        self.push_event({
-            "type": "shoot_sound"
-        })
 
     def dead_animation(self):
         self.push_event({
@@ -38,7 +34,20 @@ class ClientStarShip(ClientEntity):
 
     def shoot(self):
         self.entity.shoot()
-        self.play_shoot_sound()
+
+    def get_speed(self):
+        return self.entity.get_speed()
+
+    def set_speed(self, speed: float):
+        self.entity.set_speed(speed)
+
+    def get_rotation(self):
+        return self.entity.get_rotation()
+
+    def set_rotation(self, rotation: Vector3):
+        self.rotation = rotation
+
+        self.entity.set_rotation(rotation)
 
     def emit_events(self, events: list[dict]):
         self.entity.emit_events(events)
@@ -73,7 +82,8 @@ class ClientStarShip(ClientEntity):
 
     @staticmethod
     def from_state(state: dict):
-        weapon = Weapon.from_state(state["weapon"], AppState.get_world())
+        weapon = ClientLaserGun.from_state(
+            state["weapon"], AppState.get_world())
 
         entity = ClientStarShip(Vector3(0, 0, 0), weapon,
                                 state['class_name'], ClientStarShip.material, ClientStarShip.mesh)

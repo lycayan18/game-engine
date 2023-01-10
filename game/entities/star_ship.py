@@ -29,6 +29,9 @@ class StarShip(Player):
         direction = rotation_to_direction(self.rotation)
         self.position += direction * self.speed
 
+    def get_rotation(self) -> Vector3:
+        return self.rotation
+
     def set_rotation(self, rotation: Vector3):
         self.rotation = rotation
         self.push_event({
@@ -40,7 +43,10 @@ class StarShip(Player):
             }
         })
 
-    def set_speed(self, speed: int):
+    def get_speed(self) -> float:
+        return self.speed
+
+    def set_speed(self, speed: float):
         self.speed = speed
         self.push_event({
             'type': 'set_speed',

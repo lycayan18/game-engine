@@ -1,4 +1,4 @@
-from game.client.client_star_ship import ClientStarShip
+from game.client.entities.client_star_ship import ClientStarShip
 
 
 CLIENT_REGISTRY_ASSOCIATIONS = {
