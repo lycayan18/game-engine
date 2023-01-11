@@ -1,6 +1,6 @@
 import pygame
 from core.registry import Registry
-from game.server.server import Server
+from game.server.main_server import Server
 from game.constants.registry_associations import SERVER_REGISTRY_ASSOCIATIONS
 
 FPS = 60

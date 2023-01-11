@@ -6,7 +6,8 @@ from game.lib.rotation_to_direction import rotation_to_direction
 
 
 class StarShip(Player):
-    def __init__(self, weapon: Weapon, speed: int = 300, weight: int = 1000, rotation: Vector3 = None, *args, **kwargs):
+    def __init__(self, weapon: Weapon, speed: int = 300, weight: int = 1000, rotation: Vector3 = None,
+                 *args, **kwargs):
         super(StarShip, self).__init__(*args, **kwargs)
         self.weapon = weapon
         self.speed = speed
@@ -28,9 +29,6 @@ class StarShip(Player):
     def move(self):
         direction = rotation_to_direction(self.rotation)
         self.position += direction * self.speed
-
-    def get_rotation(self) -> Vector3:
-        return self.rotation
 
     def set_rotation(self, rotation: Vector3):
         self.rotation = rotation
