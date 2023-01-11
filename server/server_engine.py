@@ -16,7 +16,7 @@ class ServerEngine(Engine):
         return self.transmitter.clients
 
     def handle_request(self, request: Union[dict, str], response: Callable):
-        if request['request'] == 'get_state':
+        if request['request']['command'] == 'get_state':
             response(self.world.get_state())
             return True
 

@@ -84,7 +84,7 @@ class Weapon:
 
     @staticmethod
     def from_state(state: dict, world: World):
-        weapon = Weapon(world, 0.0, 0, 0, 0, 0.0)
+        weapon = Weapon(world, 0.0, 0, 0, 0, 0, 0.0)
 
         weapon.set_state(state)
 

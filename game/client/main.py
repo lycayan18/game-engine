@@ -10,6 +10,8 @@ from core.world import World
 from core.registry import Registry
 from game.utils.keyboard_control_manager import KeyboardControlManager
 from game.client.load_assets import load_assets
+from game.client.init_client_entities import init_client_entities
+from game.client.ship_control import ship_control
 
 controls_manager = KeyboardControlManager()
 
@@ -32,6 +34,8 @@ def init_modules(engine: Client):
 
     renderer = OpenGLRenderer(*AppState.get_screen_resolution(), Camera())
 
+    AppState.set_camera(renderer.get_camera())
+
     engine.add_module(renderer)
 
     # Init sound subsystem
@@ -49,7 +53,6 @@ def init_modules(engine: Client):
 
 
 def update_all(engine: Client):
-    engine.request_current_entity_id()
     engine.send_world_state_request()
     engine.send_pull_events_request()
     engine.send_events()
@@ -94,6 +97,20 @@ def wait_for_current_player_entity(engine: Client):
         run_basic_routine()
 
 
+def wait_for_first_world_state(engine: Client, world: World):
+    """
+    Requests world state and waits for it.
+    """
+
+    update_all(engine)
+
+    while not world.entities:
+        engine.tick()
+
+        # Let user at least close the window while waiting
+        run_basic_routine()
+
+
 def main(ip: str, port: int):
     # *****************************
     # * Initialize everything
@@ -105,6 +122,7 @@ def main(ip: str, port: int):
 
     controls_manager.bind_key(pygame.K_w, 'forward')
     controls_manager.bind_key(pygame.K_s, 'backward')
+    controls_manager.bind_key(None, 'shoot')
 
     # Initialize engine, world, modules, etc.
 
@@ -117,28 +135,38 @@ def main(ip: str, port: int):
 
     init_modules(engine)
 
-    print("\rLoading assets...", end='')
+    print("\rLoading assets...      ", end='')
 
     load_assets()
 
-    print("\rAuthorizing client...", end='')
+    print("\rInitializing client entities...", end='')
+
+    init_client_entities(engine)
+
+    print("\rAuthorizing client...          ", end='')
 
     wait_for_client_authorize(engine)
 
-    print("\rWaiting for player entity...", end='')
+    print("\rWaiting for player entity...   ", end='')
 
     wait_for_current_player_entity(engine)
+
+    wait_for_first_world_state(engine, world)
 
     AppState.set_current_player_entity(
         world.get_entity_by_id(engine.get_current_entity_id())
     )
 
-    print("\rDone!")
+    print("\rDone!                          ")
+
+    clock = pygame.time.Clock()
 
     while True:
         engine.tick()
 
         update_all(engine)
+
+        ship_control(controls_manager, AppState.get_camera())
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -151,3 +179,4 @@ def main(ip: str, port: int):
                 controls_manager.handle_key_up(event.key)
 
         pygame.display.flip()
+        clock.tick(60)

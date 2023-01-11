@@ -17,5 +17,5 @@ def main(ip, port):
 
             clock.tick(FPS)
         except Exception as e:
-            print(e)
             server.shutdown()
+            raise e

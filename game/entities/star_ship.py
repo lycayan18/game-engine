@@ -76,7 +76,9 @@ class StarShip(Player):
 
     def set_state(self, state: dict):
         super(StarShip, self).set_state(state)
-        self.weapon = state.get('weapon', None)
+
+        self.weapon.set_state(state.get("weapon"))
+
         self.rotation = Vector3(
             state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])
 

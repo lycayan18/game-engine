@@ -30,6 +30,7 @@ class Server(ServerEngine):
         self.clients_with_id: dict[int, StarShip] = {}
 
     def handle_request(self, request: Union[dict[str, dict], dict, str], response: Callable):
+
         # проверка на обработку запроса ServerEngine'ом
         if super(Server, self).handle_request(request, response):
             return
@@ -62,9 +63,9 @@ class Server(ServerEngine):
         response(self.last_events[:])
 
     def handle_push_events_request(self, response: Callable, parameters):
-        self.world.emit_events(parameters)
+        self.world.emit_events(parameters['events'])
 
     def tick(self):
-        super().tick()
+        super(Server, self).tick()
 
         self.last_events = self.world.get_last_events()

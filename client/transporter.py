@@ -24,5 +24,7 @@ class Transporter:
         data = json.loads(response_data)
         self.callbacks[data['id']](data['out'])
 
+        self.callbacks[data['id']] = None
+
     def run(self):
         self.transmitter.run()

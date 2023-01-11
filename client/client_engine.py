@@ -53,8 +53,6 @@ class ClientEngine(Engine):
     def tick(self):
         super(ClientEngine, self).tick()
 
-        print(self.transmitter.sock.getblocking())
-
         self.transporter.run()
 
     def shutdown(self):
