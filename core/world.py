@@ -18,6 +18,9 @@ class World:
     def set_state(self, state: dict):
         updated_entities_id: list[int] = list()
 
+        self.start_time = datetime.datetime.fromisoformat(
+            state.get("start_time"))
+
         self.entity_unique_id = state.get(
             "entity_unique_id", self.entity_unique_id)
         self.map_object_unique_id = state.get(
@@ -70,7 +73,8 @@ class World:
             'entity_unique_id': self.entity_unique_id,
             'map_object_unique_id': self.map_object_unique_id,
             'entities': [],
-            'map_objects': []
+            'map_objects': [],
+            'start_time': self.start_time.isoformat()
         }
 
         for entity in self.entities:
