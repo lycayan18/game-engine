@@ -32,7 +32,7 @@ def create_valid_position(world: World):
 def generate_star_ship(world: World, id: int = 0) -> StarShip:
     position = create_valid_position(world)
 
-    star_ship = StarShip(weapon=LaserGun(world), position=position)
+    star_ship = StarShip(weapon=LaserGun(world), position=position, class_name='ent_star_ship')
     star_ship.id = id
 
     return star_ship
