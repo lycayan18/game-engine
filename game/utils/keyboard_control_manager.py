@@ -36,11 +36,11 @@ class KeyboardControlManager:
         return out
 
     def handle_key_down(self, key: int):
-        for action in self.keys[key]:
+        for action in self.keys.get(key, []):
             self.actions[action] += 1
 
     def handle_key_up(self, key: int):
-        for action in self.keys[key]:
+        for action in self.keys.get(key, []):
             self.actions[action] -= 1
 
     def is_active(self, action: str) -> bool:

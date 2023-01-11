@@ -7,6 +7,7 @@ from client.camera import Camera
 from game.client.entities.client_star_ship import ClientStarShip
 from game.utils.keyboard_control_manager import KeyboardControlManager
 from game.client.app_state import AppState
+from game.lib.rotation_to_direction import rotation_to_direction
 
 MIN_SPEED = 300
 MAX_SPEED = 600
@@ -16,10 +17,13 @@ ANGLE_MOUSE_ACCELERATION = 180 * pi / 180 / 60
 
 
 def update_camera_position(camera: Camera, player: ClientStarShip):
-    pass
+    forward = rotation_to_direction(player.get_rotation())
+
+    camera.set_position(player.get_position() - forward * Vector3(2))
+    camera.set_rotation(player.get_rotation())
 
 
-def ship_control(controls_manager: KeyboardControlManager):
+def ship_control(controls_manager: KeyboardControlManager, camera: Camera):
     width, height = pygame.display.get_window_size()
 
     player: ClientStarShip = AppState.get_current_player_entity()
@@ -52,4 +56,4 @@ def ship_control(controls_manager: KeyboardControlManager):
     if controls_manager.is_active("shoot") or pygame.mouse.get_pressed()[0]:
         player.shoot()
 
-    update_camera_position()
+    update_camera_position(camera, player)

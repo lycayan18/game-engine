@@ -15,4 +15,4 @@ class ClientLaserGun(ClientWeapon):
 
     @staticmethod
     def from_state(state: dict, world: World):
-        return ClientWeapon(ClientLaserGun.from_state(state, world), Assets.sounds.laser_gun_shot)
+        return ClientWeapon(LaserGun.from_state(state, world), Assets.sounds.laser_gun_shot)

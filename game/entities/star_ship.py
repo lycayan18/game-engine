@@ -78,7 +78,9 @@ class StarShip(Player):
 
     def set_state(self, state: dict):
         super(StarShip, self).set_state(state)
-        self.weapon = state.get('weapon', None)
+
+        self.weapon.set_state(state.get("weapon"))
+
         self.rotation = Vector3(
             state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])
 
@@ -107,7 +109,7 @@ class StarShip(Player):
                 self.stop_registering_events()
 
             if event.get("type", None) == "weapon_shoot":
-                self.shoot_event(Vector3(**event["position"]))
+                self.shoot_event(Vector3(**event["position"]), Vector3(**event["rotation"]))
             elif event.get("type", None) == "set_speed":
                 self.set_speed(event["speed"])
             elif event.get("type", None) == "set_rotation":

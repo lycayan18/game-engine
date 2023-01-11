@@ -1,6 +1,7 @@
 from core.utils.event_emitter import EventEmitter
 from core.entities.player import Player
 from core.world import World
+from client.camera import Camera
 
 
 class AppState:
@@ -12,6 +13,7 @@ class AppState:
     fps = 60.0
     screen_resolution = (800, 600)
     current_player_entity = None
+    camera = None
     world = None
     event_emitter = EventEmitter()
 
@@ -24,6 +26,16 @@ class AppState:
     @staticmethod
     def get_world() -> World:
         return AppState.world
+
+    @staticmethod
+    def set_camera(camera: Camera):
+        AppState.camera = camera
+
+        AppState.event_emitter.emit("camera_changed", camera)
+
+    @staticmethod
+    def get_camera() -> Camera:
+        return AppState.camera
 
     @staticmethod
     def set_volume(value: float):

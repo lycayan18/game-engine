@@ -35,7 +35,7 @@ class Sphere(Shape):
         self.radius = radius
 
     def collide_point(self, point: Vector3) -> bool:
-        return Vector3.distance(point, self.positoin) <= self.radius
+        return Vector3.distance(point, self.position) <= self.radius
 
     def line_intersection(self, a: Vector3, b: Vector3) -> Vector3:
         direction = Vector3.normalized(b - a)
