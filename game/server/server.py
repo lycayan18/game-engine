@@ -9,8 +9,8 @@ from game.generate_star_ship import generate_star_ship
 
 
 class Server(ServerEngine):
-    def __init__(self, ip: str, port: int):
-        super(Server, self).__init__(World(Registry()), ip, port)
+    def __init__(self, registry: Registry, ip: str, port: int):
+        super(Server, self).__init__(World(registry), ip, port)
 
         generate_planet(self.world, 15)
 

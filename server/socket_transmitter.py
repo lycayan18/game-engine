@@ -39,6 +39,9 @@ class SocketTransmitter:
         self.accept_client()
         self.get_request()
 
+    def close(self):
+        self.sock.close()
+
     @staticmethod
     def send_data(connection: socket.socket, data: str):
         # we receive the client's data (connection)

@@ -23,8 +23,8 @@ def init_modules(engine: Client):
 
     pygame.init()
     pygame.font.init()
-    pygame.display.gl_get_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
-    pygame.display.gl_get_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MAJOR_VERSION, 3)
+    pygame.display.gl_set_attribute(pygame.GL_CONTEXT_MINOR_VERSION, 3)
     pygame.display.gl_set_attribute(pygame.GL_CONTEXT_PROFILE_MASK,
                                     pygame.GL_CONTEXT_PROFILE_CORE)
     pygame.display.set_mode(AppState.get_screen_resolution(),
@@ -99,6 +99,8 @@ def main(ip: str, port: int):
     # * Initialize everything
     # *****************************
 
+    print("Starting client...", end='')
+
     # Initialize controls
 
     controls_manager.bind_key(pygame.K_w, 'forward')
@@ -111,16 +113,27 @@ def main(ip: str, port: int):
 
     AppState.set_world(world)
 
+    print("\rInitializing modules...", end='')
+
     init_modules(engine)
+
+    print("\rLoading assets...", end='')
 
     load_assets()
 
+    print("\rAuthorizing client...", end='')
+
     wait_for_client_authorize(engine)
+
+    print("\rWaiting for player entity...", end='')
+
     wait_for_current_player_entity(engine)
 
     AppState.set_current_player_entity(
         world.get_entity_by_id(engine.get_current_entity_id())
     )
+
+    print("\rDone!")
 
     while True:
         engine.tick()
@@ -130,8 +143,11 @@ def main(ip: str, port: int):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                engine.shutdown()
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 controls_manager.handle_key_down(event.key)
             elif event.type == pygame.KEYUP:
                 controls_manager.handle_key_up(event.key)
+
+        pygame.display.flip()

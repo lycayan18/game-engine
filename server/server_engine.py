@@ -21,4 +21,9 @@ class ServerEngine(Engine):
             return True
 
     def tick(self):
+        super(ServerEngine, self).tick()
+
         self.transporter.run()
+
+    def shutdown(self):
+        self.transmitter.close()

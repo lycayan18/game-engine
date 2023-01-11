@@ -49,3 +49,13 @@ class ClientEngine(Engine):
             "command": command,
             "parameters": parameters
         }, callback)
+
+    def tick(self):
+        super(ClientEngine, self).tick()
+
+        print(self.transmitter.sock.getblocking())
+
+        self.transporter.run()
+
+    def shutdown(self):
+        self.transmitter.close()
