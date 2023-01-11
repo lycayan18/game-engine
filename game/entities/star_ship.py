@@ -61,16 +61,15 @@ class StarShip(Player):
         For shooting call "shoot" function, this function is for other purposes.
         """
 
-        self.push_event({
-            "type": "weapon_shoot",
-            "position": {
-                "x": position.x,
-                "y": position.y,
-                "z": position.z
-            }
-        })
-
-        self.weapon.shoot(current_position=position)
+        if self.weapon.shoot(current_position=position):
+            self.push_event({
+                "type": "weapon_shoot",
+                "position": {
+                    "x": position.x,
+                    "y": position.y,
+                    "z": position.z
+                }
+            })
 
     def shoot(self):
         self.shoot_event(self.position)

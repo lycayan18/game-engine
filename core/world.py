@@ -168,4 +168,4 @@ class World:
         self.event_emitter.emit("after_tick")
 
     def get_time(self):
-        return self.start_time - datetime.datetime.now()
+        return datetime.datetime.now() - self.start_time

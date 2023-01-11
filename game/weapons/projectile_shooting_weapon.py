@@ -10,11 +10,23 @@ class ProjectileShootingWeapon(Weapon):
         self.bullet_speed = bullet_speed
 
     def shoot(self, current_position: Vector3, rotation: Vector3):
-        if self.bullet_count > 0 and self.current_bullets_in_clip > 0 and self.is_reloaded():
+        if self.is_ready():
             bullet = self.bullet(self.world, current_position, rotation, self.damage, self.max_distance,
                                  self.bullet_speed)
 
             self.world.add_entity(bullet)
+
+            self.current_bullets_in_clip -= 1
+
+            self.recharge()
+
+            return True
+
+    def get_state(self) -> dict:
+        return {
+            **super().get_state(),
+            "bullet_speed": self.bullet_speed
+        }
 
     def set_state(self, state: dict):
         super(ProjectileShootingWeapon, self).set_state(state)
