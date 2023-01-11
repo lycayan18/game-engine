@@ -12,14 +12,16 @@ class ClientStarShip(ClientEntity):
     mesh = None
     material = None
 
-    def __init__(self, position: Vector3, weapon: ClientWeapon, class_name: str, material: BaseMaterial, mesh: Mesh = None,
+    def __init__(self, position: Vector3, weapon: ClientWeapon, class_name: str, material: BaseMaterial,
+                 mesh: Mesh = None,
                  rotation: Vector3 = None, scale: Vector3 = None):
 
         rotation = rotation or Vector3(0, 0, 0)
         scale = scale or Vector3(1, 1, 1)
 
         super(ClientStarShip, self).__init__(
-            StarShip(weapon, 1000, rotation, class_name, position, 100.0),
+            StarShip(weapon=weapon, speed=300, weight=1000, rotation=rotation, class_name=class_name, position=position,
+                     health=100.0),
             class_name, material, mesh, rotation, scale
         )
 

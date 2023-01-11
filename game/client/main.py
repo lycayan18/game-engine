@@ -5,7 +5,7 @@ from game.client.app_state import AppState
 from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
 from client.renderers.opengl.opengl_renderer import OpenGLRenderer
-from game.client.client import Client
+from game.client.main_client import Client
 from core.world import World
 from core.registry import Registry
 from game.utils.keyboard_control_manager import KeyboardControlManager

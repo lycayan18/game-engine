@@ -9,8 +9,8 @@ from game.client.assets.assets import Assets
 class ClientLaserGun(ClientWeapon):
     def __init__(self):
         super(ClientLaserGun, self).__init__(
-            LaserGun(AppState.world),
-            Assets.sounds.laser_gun_shot
+            weapon=LaserGun(AppState.world),
+            shoot_sound=Assets.sounds.laser_gun_shot
         )
 
     @staticmethod

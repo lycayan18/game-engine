@@ -2,6 +2,8 @@ import struct
 import ctypes
 import glm
 from OpenGL.GL import *
+
+from client.client_map_object import ClientMapObject
 from core.mesh import Mesh
 from core.module import BaseModule
 from core.utils.event_emitter import EventEmitter
@@ -172,8 +174,8 @@ class OpenGLRenderer(GraphicsModule):
             -camera_position.x, -camera_position.y, camera_position.z
         ))
 
-        for entity in self.world.entities:
-            if isinstance(entity, ClientEntity):
+        for entity in self.world.entities + self.world.map_objects:
+            if isinstance(entity, ClientEntity) or isinstance(entity, ClientMapObject):
                 # *************************************************
                 # * Generate matrices
                 # *************************************************
