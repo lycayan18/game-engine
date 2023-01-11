@@ -6,7 +6,7 @@ from game.entities.bullet import Bullet
 class LaserGun(ProjectileShootingWeapon):
     def __init__(self, world: World):
         damage = 10
-        bullet_recharge_time = 3
+        bullet_recharge_time = 0.1
         clip_recharge_time = 3
         bullet_speed = 500
         bullet_count = 500

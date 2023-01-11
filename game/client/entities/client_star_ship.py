@@ -61,8 +61,6 @@ class ClientStarShip(ClientEntity):
 
             if event.get("type", None) == "play_dead_animation":
                 self.dead_animation()
-            elif event.get("type", None) == "shoot_sound":
-                self.play_shoot_sound()
 
             if currently_registering_events:
                 self.start_registering_events()
@@ -79,6 +77,12 @@ class ClientStarShip(ClientEntity):
 
         # Update link to position
         self.position = self.entity.position
+
+    def get_last_events(self) -> list[dict]:
+        return self.entity.get_last_events()
+
+    def emit_events(self, events: list[dict]):
+        self.entity.emit_events(events)
 
     @staticmethod
     def from_state(state: dict):

@@ -161,6 +161,8 @@ def main(ip: str, port: int):
 
     clock = pygame.time.Clock()
 
+    AppState.get_current_player_entity().start_registering_events()
+
     while True:
         engine.tick()
 

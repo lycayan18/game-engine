@@ -27,7 +27,7 @@ class Bullet(Entity):
         self.prev_position = self.position.copy()
 
         direction = rotation_to_direction(self.rotation)
-        self.position += direction * self.speed
+        self.position += direction * Vector3(self.speed)
         self.push_event({
             "type": "bullet_move",
             "position": {

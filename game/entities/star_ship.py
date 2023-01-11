@@ -53,7 +53,7 @@ class StarShip(Player):
             'speed': self.speed
         })
 
-    def shoot_event(self, position: Vector3):
+    def shoot_event(self, position: Vector3, rotation: Vector3):
         """
         Shoots by weapon from provided position.
         Useful for events as this function provides convenient interface for emitting
@@ -61,18 +61,23 @@ class StarShip(Player):
         For shooting call "shoot" function, this function is for other purposes.
         """
 
-        if self.weapon.shoot(current_position=position):
+        if self.weapon.shoot(current_position=position, rotation=rotation):
             self.push_event({
                 "type": "weapon_shoot",
                 "position": {
                     "x": position.x,
                     "y": position.y,
                     "z": position.z
+                },
+                "rotation": {
+                    "x": rotation.x,
+                    "y": rotation.y,
+                    "z": rotation.z
                 }
             })
 
     def shoot(self):
-        self.shoot_event(self.position)
+        self.shoot_event(self.position, self.rotation)
 
     def set_state(self, state: dict):
         super(StarShip, self).set_state(state)
@@ -107,11 +112,12 @@ class StarShip(Player):
                 self.stop_registering_events()
 
             if event.get("type", None) == "weapon_shoot":
-                self.shoot_event(Vector3(**event["position"]))
+                self.shoot_event(
+                    Vector3(**event["position"]), Vector3(**event["rotation"]))
             elif event.get("type", None) == "set_speed":
                 self.set_speed(event["speed"])
             elif event.get("type", None) == "set_rotation":
-                self.set_rotation(Vector3(event["rotation"]))
+                self.set_rotation(Vector3(**event["rotation"]))
 
             if currently_registering_events:
                 self.start_registering_events()
