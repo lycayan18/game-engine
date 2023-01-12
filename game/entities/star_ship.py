@@ -14,6 +14,7 @@ class StarShip(Player):
 
         self.speed = speed
         self.weight = weight
+        self.acceleration = Vector3(0)
         self.rotation = rotation or Vector3(0, 0, 0)
 
         self.starship_bounding_box = Box(
@@ -29,8 +30,10 @@ class StarShip(Player):
         self.weapon = weapon
 
     def move(self):
+        self.position += self.acceleration
+
         direction = rotation_to_direction(self.rotation)
-        self.position += direction * Vector3(self.speed * 0.0)
+        self.position += direction * Vector3(self.speed)
 
     def set_rotation(self, rotation: Vector3):
         self.rotation = rotation
@@ -91,11 +94,17 @@ class StarShip(Player):
         self.weapon.set_state(state.get("weapon"))
 
         self.rotation = Vector3(**state['rotation'])
+        self.acceleration = Vector3(**state['acceleration'])
 
     def get_state(self) -> dict:
         state = {
             **super(StarShip, self).get_state(),
             'weapon': self.weapon.get_state(),
+            'acceleration': {
+                'x': self.acceleration.x,
+                'y': self.acceleration.y,
+                'z': self.acceleration.z
+            },
             'rotation': {
                 'x': self.rotation.x,
                 'y': self.rotation.y,

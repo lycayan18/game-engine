@@ -37,7 +37,7 @@ class ClientPlanet(ClientMapObject):
         planet = Planet.from_state(state, AppState.get_world())
 
         obj = ClientPlanet(planet, material, Mesh(
-            generate_sphere(planet.radius, 6, 3), AppState.get_engine()))
+            generate_sphere(planet.radius, 32, 16), AppState.get_engine()))
 
         obj.id = planet.id
 

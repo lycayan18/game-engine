@@ -33,3 +33,6 @@ class SoundEntity(Entity):
 
     def play(self):
         self.sound.play()
+
+    def stop(self):
+        self.sound.stop()

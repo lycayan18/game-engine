@@ -14,7 +14,7 @@ class Server(ServerEngine):
     def __init__(self, registry: Registry, ip: str, port: int):
         super(Server, self).__init__(World(registry), ip, port)
 
-        generate_planet(self.world, 3)
+        generate_planet(self.world, 5)
 
         self.last_events = []
 

@@ -8,7 +8,7 @@ from client.materials.default import DefaultMaterial
 
 class ClientEntity(ViewableEntity):
     def __init__(self, entity: Entity, class_name: str, material: BaseMaterial, mesh: Mesh = None,
-                 rotation: Vector3 = None, scale: Vector3 = None):
+                 rotation: Vector3 = None, scale: Vector3 = None, visible: bool = True):
 
         self.rotation = rotation or Vector3(0, 0, 0)
         self.scale = scale or Vector3(1, 1, 1)
@@ -16,7 +16,7 @@ class ClientEntity(ViewableEntity):
         super().__init__(class_name, entity.position, mesh, self.rotation, self.scale)
 
         self.material = material
-
+        self.visible = visible
         self.entity = entity
 
     def get_material(self):

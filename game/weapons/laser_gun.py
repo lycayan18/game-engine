@@ -8,7 +8,7 @@ class LaserGun(ProjectileShootingWeapon):
         damage = 10
         bullet_recharge_time = 0.1
         clip_recharge_time = 3
-        bullet_speed = 0.1
+        bullet_speed = 10
         bullet_count = 500
         max_bullets_in_clip = 50
         max_distance = 100

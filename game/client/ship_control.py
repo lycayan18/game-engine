@@ -9,9 +9,9 @@ from game.utils.keyboard_control_manager import KeyboardControlManager
 from game.client.app_state import AppState
 from game.lib.rotation_to_direction import rotation_to_direction
 
-MIN_SPEED = 300
-MAX_SPEED = 600
-ACCELERATION = 100 / 60  # Divide by FPS to make it acceleration per second
+MIN_SPEED = 10 / 60
+MAX_SPEED = 20 / 60
+ACCELERATION = 3 / 60  # Divide by FPS to make it acceleration per second
 # Divide by FPS to make it acceleration per second
 ANGLE_MOUSE_ACCELERATION = 60 * pi / 180
 
@@ -43,7 +43,7 @@ def ship_control(controls_manager: KeyboardControlManager, camera: Camera):
     x = x / width * 2.0 - 1.0
     y = y / height * 2.0 - 1.0
 
-    if x != 0 or y != 0:
+    if (x != 0 or y != 0) and controls_manager.is_active("capture"):
         # Cursor position back to screen center
         pygame.mouse.set_pos(width / 2, height / 2)
 

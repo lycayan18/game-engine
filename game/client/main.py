@@ -1,6 +1,6 @@
 import sys
 import pygame
-from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule
+from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule, PygameSound
 from game.client.app_state import AppState
 from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
@@ -12,6 +12,7 @@ from game.utils.keyboard_control_manager import KeyboardControlManager
 from game.client.load_assets import load_assets
 from game.client.init_client_entities import init_client_entities
 from game.client.ship_control import ship_control
+from game.client.setup_background_sounds import setup_background_sounds
 
 controls_manager = KeyboardControlManager()
 
@@ -122,6 +123,7 @@ def main(ip: str, port: int):
 
     controls_manager.bind_key(pygame.K_w, 'forward')
     controls_manager.bind_key(pygame.K_s, 'backward')
+    controls_manager.bind_key(pygame.K_LSHIFT, 'capture')
     controls_manager.bind_key(None, 'shoot')
 
     # Initialize engine, world, modules, etc.
@@ -158,6 +160,8 @@ def main(ip: str, port: int):
         world.get_entity_by_id(engine.get_current_entity_id())
     )
 
+    setup_background_sounds()
+
     print("\rDone!                          ")
 
     clock = pygame.time.Clock()
@@ -167,6 +171,9 @@ def main(ip: str, port: int):
     player = AppState.get_current_player_entity()
 
     player.weapon.set_owner(player.id)
+    player.visible = False
+
+    player.shutoff_engine_sound()
 
     frame = 0
 

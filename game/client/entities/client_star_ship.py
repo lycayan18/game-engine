@@ -1,11 +1,15 @@
+import pygame
 from client.base_material import BaseMaterial
 from client.client_entity import ClientEntity
+from client.sound_modules.pygame.sound import PygameSound
 from core.mesh import Mesh
 from core.vector3 import Vector3
+from client.entities.sound_entity import SoundEntity
 from game.entities.star_ship import StarShip
 from game.client.weapons.client_weapon import ClientWeapon
 from game.client.weapons.laser_gun import ClientLaserGun
 from game.client.app_state import AppState
+from game.client.assets.assets import Assets
 
 
 class ClientStarShip(ClientEntity):
@@ -25,12 +29,29 @@ class ClientStarShip(ClientEntity):
             class_name, material, mesh, rotation, scale
         )
 
+        self.sound_entity: SoundEntity = SoundEntity(
+            PygameSound(pygame.mixer.Sound(
+                "./game/client/assets/sounds/space_engine.wav"
+            )), self.position, "entity_sfx", True, 40)
+
+        self.sound_entity.id = -1
+
+        AppState.world.add_entity(self.sound_entity, False)
+
+        self.sound_entity.sound.set_repeatable(True)
+
+        self.sound_entity.play()
+
         self.weapon = weapon
 
     def dead_animation(self):
         self.push_event({
             "type": "play_dead_animation"
         })
+
+    def shutoff_engine_sound(self):
+        self.sound_entity.stop()
+        self.sound_entity.sound.set_repeatable(False)
 
     def dead(self):
         self.entity.dead()
@@ -92,6 +113,9 @@ class ClientStarShip(ClientEntity):
 
     def emit_events(self, events: list[dict]):
         self.entity.emit_events(events)
+
+    def think(self):
+        self.sound_entity.position = self.position
 
     @staticmethod
     def from_state(state: dict):

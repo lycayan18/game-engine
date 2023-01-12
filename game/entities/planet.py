@@ -41,17 +41,12 @@ class Planet(MapObject):
         return state
 
     def think(self):
-        return
-
         for entity in self.world.entities:
             if isinstance(entity, StarShip):
                 force = self.calculate_gravity(entity)
-                entity.position.x = entity.position.x - \
-                    force if entity.position.x > self.position.x else entity.position.x + force
-                entity.position.y = entity.position.y - \
-                    force if entity.position.y > self.position.y else entity.position.y + force
-                entity.position.z = entity.position.z - \
-                    force if entity.position.z > self.position.z else entity.position.z + force
+
+                entity.acceleration += Vector3.normalized(
+                    self.position - entity.position) * Vector3(force)
 
                 if self.sphere.collide_point(entity.get_position()):
                     entity.dead()

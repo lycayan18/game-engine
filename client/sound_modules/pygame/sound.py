@@ -33,7 +33,7 @@ class PygameSound(Sound):
         if self.current_channel:
             if not self.current_channel.get_busy():
                 if self.repeatable:
-                    self.current_channel.play()
+                    self.current_channel.play(self.sound)
                 else:
                     self.current_channel = None
 
