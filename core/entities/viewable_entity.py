@@ -4,12 +4,16 @@ from core.vector3 import Vector3
 
 
 class ViewableEntity(Entity):
-    def __init__(self, class_name: str, position: Vector3 = Vector3(0, 0, 0), mesh: Mesh = None,
-                 rotation: Vector3 = Vector3(0, 0, 0), scale: Vector3 = Vector3(1, 1, 1)):
+    def __init__(self, class_name: str, position: Vector3 = None, mesh: Mesh = None,
+                 rotation: Vector3 = None, scale: Vector3 = None):
+
+        self.position = position or Vector3(0, 0, 0)
         super().__init__(position, class_name)
+
+        self.rotation = rotation or Vector3(0, 0, 0)
+        self.scale = scale or Vector3(1, 1, 1)
+
         self.mesh = mesh
-        self.rotation = rotation
-        self.scale = scale
 
     def set_mesh(self, mesh: Mesh):
         self.mesh = mesh
@@ -30,7 +34,7 @@ class ViewableEntity(Entity):
         return self.scale
 
     def set_state(self, state: dict):
-        super(Entity, self).set_state(state)
+        super(ViewableEntity, self).set_state(state)
 
         self.rotation = Vector3(
             state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])

@@ -6,3 +6,6 @@
 /pythree/build/
 /*.pyd
 /*.so
+/example.py
+**/*.png
+**/*.glb

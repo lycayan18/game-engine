@@ -1,3 +1,4 @@
+import datetime
 from core.utils.event_emitter import EventEmitter
 from core.entity import Entity
 from core.map_object import MapObject
@@ -12,9 +13,13 @@ class World:
         self.map_object_unique_id = 0  # For generating map object unique id
         self.registry = registry
         self.event_emitter = EventEmitter()
+        self.start_time = datetime.datetime.now()
 
     def set_state(self, state: dict):
         updated_entities_id: list[int] = list()
+
+        self.start_time = datetime.datetime.fromisoformat(
+            state.get("start_time"))
 
         self.entity_unique_id = state.get(
             "entity_unique_id", self.entity_unique_id)
@@ -44,7 +49,7 @@ class World:
 
         # Delete all not included in world state entities
         for entity in self.entities:
-            if entity.id not in updated_entities_id:
+            if entity.id not in updated_entities_id and entity.id >= 0:
                 self.remove_entity(entity)
 
         # Update map object states
@@ -68,7 +73,8 @@ class World:
             'entity_unique_id': self.entity_unique_id,
             'map_object_unique_id': self.map_object_unique_id,
             'entities': [],
-            'map_objects': []
+            'map_objects': [],
+            'start_time': self.start_time.isoformat()
         }
 
         for entity in self.entities:
@@ -78,6 +84,28 @@ class World:
             state['map_objects'].append(map_object.get_state())
 
         return state
+
+    def get_last_events(self) -> list[dict]:
+        events: list[dict] = []
+
+        for entity in self.entities:
+            events.append({
+                "target": entity.id,
+                "events": entity.get_last_events()
+            })
+
+        return events
+
+    def emit_events(self, events: list[dict]):
+        for event_list_descriptor in events:
+            target = event_list_descriptor["target"]
+            events = event_list_descriptor["events"]
+
+            entity = self.get_entity_by_id(target)
+
+            # By some reason we may not find the target entity, so check for that
+            if entity is not None:
+                entity.emit_events(events)
 
     def get_entity_by_id(self, id: int) -> Entity:
         for entity in self.entities:
@@ -132,9 +160,16 @@ class World:
         self.event_emitter.emit("before_tick")
 
         for entity in self.entities:
+            if entity.deleted:
+                self.remove_entity(entity)
+                continue
+
             entity.think()
 
         for object in self.map_objects:
             object.think()
 
         self.event_emitter.emit("after_tick")
+
+    def get_time(self):
+        return datetime.datetime.now() - self.start_time

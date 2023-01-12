@@ -10,11 +10,12 @@ from typing import Union
 
 
 class Registry:
-    def __init__(self, associates: dict[str, Union[Entity, MapObject]] = dict()):
-        self.classnames: dict[str, Union[Entity, MapObject]] = associates
+    def __init__(self, associates: dict[str, Union[Entity.__class__, MapObject.__class__]] = dict()):
+        self.classnames: dict[str, Union[Entity.__class__, MapObject.__class__]] = associates
 
-    def associate(self, classname: str, constructor: Union[Entity, MapObject]):
+    def associate(self, classname: str, constructor: Union[Entity.__class__, MapObject.__class__]):
         self.classnames[classname] = constructor
 
-    def get_constructor(self, classname: str, default: Union[Entity, MapObject]) -> Union[Entity, MapObject]:
+    def get_constructor(self, classname: str, default: Union[Entity.__class__, MapObject.__class__]) -> Union[
+        Entity.__class__, MapObject.__class__]:
         return self.classnames.get(classname, default)
