@@ -1,5 +1,7 @@
 from typing import Union, Callable
 
+from datetime import datetime
+
 from core.world import World
 from core.registry import Registry
 from game.entities.star_ship import StarShip
@@ -12,7 +14,7 @@ class Server(ServerEngine):
     def __init__(self, registry: Registry, ip: str, port: int):
         super(Server, self).__init__(World(registry), ip, port)
 
-        generate_planet(self.world, 15)
+        generate_planet(self.world, 3)
 
         self.last_events = []
 
@@ -30,7 +32,6 @@ class Server(ServerEngine):
         self.clients_with_id: dict[int, StarShip] = {}
 
     def handle_request(self, request: Union[dict[str, dict], dict, str], response: Callable):
-
         # проверка на обработку запроса ServerEngine'ом
         if super(Server, self).handle_request(request, response):
             return
@@ -51,13 +52,13 @@ class Server(ServerEngine):
         response(self.clients_with_id[parameters['client_id']].id)
 
     def handle_get_client_id_request(self, response: Callable, parameters: dict):
-        response(self.client_unique_id)
-
         star_ship = generate_star_ship(self.world)
         self.world.add_entity(star_ship)
 
         self.clients_with_id[self.client_unique_id] = star_ship
         self.client_unique_id += 1
+
+        response(self.client_unique_id - 1)
 
     def handle_pull_events_request(self, response: Callable, parameters: dict):
         response(self.last_events[:])

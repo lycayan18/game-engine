@@ -9,7 +9,7 @@ class Transmitter:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((ip, port))
 
-        self.sock.settimeout(0.001)
+        self.sock.settimeout(0.01)
 
     def on(self, data: str,  callback: Callable):
         self.event_emitter.on(data, callback)

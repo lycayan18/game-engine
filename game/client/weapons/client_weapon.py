@@ -49,6 +49,9 @@ class ClientWeapon:
     def recharge(self):
         self.weapon.recharge()
 
+    def set_owner(self, owner: int):
+        self.weapon.set_owner(owner)
+
     def get_state(self) -> dict:
         return self.weapon.get_state()
 

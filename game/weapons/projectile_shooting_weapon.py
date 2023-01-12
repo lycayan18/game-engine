@@ -11,7 +11,7 @@ class ProjectileShootingWeapon(Weapon):
 
     def shoot(self, current_position: Vector3, rotation: Vector3):
         if self.is_ready():
-            bullet = self.bullet(self.world, current_position, rotation, self.damage, self.max_distance,
+            bullet = self.bullet(self.world, self.owner, current_position, rotation, self.damage, self.max_distance,
                                  self.bullet_speed)
 
             self.world.add_entity(bullet)
@@ -23,11 +23,14 @@ class ProjectileShootingWeapon(Weapon):
             return True
 
     def get_state(self) -> dict:
-        return {
-            **super().get_state(),
+        state = {
+            **super(ProjectileShootingWeapon, self).get_state(),
             "bullet_speed": self.bullet_speed
         }
 
+        return state
+
     def set_state(self, state: dict):
         super(ProjectileShootingWeapon, self).set_state(state)
+
         self.bullet_speed = state['bullet_speed']

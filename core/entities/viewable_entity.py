@@ -7,7 +7,7 @@ class ViewableEntity(Entity):
     def __init__(self, class_name: str, position: Vector3 = None, mesh: Mesh = None,
                  rotation: Vector3 = None, scale: Vector3 = None):
 
-        position = position or Vector3(0, 0, 0)
+        self.position = position or Vector3(0, 0, 0)
         super().__init__(position, class_name)
 
         self.rotation = rotation or Vector3(0, 0, 0)
@@ -34,7 +34,7 @@ class ViewableEntity(Entity):
         return self.scale
 
     def set_state(self, state: dict):
-        super(Entity, self).set_state(state)
+        super(ViewableEntity, self).set_state(state)
 
         self.rotation = Vector3(
             state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])

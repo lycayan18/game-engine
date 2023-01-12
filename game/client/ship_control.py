@@ -13,13 +13,13 @@ MIN_SPEED = 300
 MAX_SPEED = 600
 ACCELERATION = 100 / 60  # Divide by FPS to make it acceleration per second
 # Divide by FPS to make it acceleration per second
-ANGLE_MOUSE_ACCELERATION = 180 * pi / 180 / 60
+ANGLE_MOUSE_ACCELERATION = 60 * pi / 180
 
 
 def update_camera_position(camera: Camera, player: ClientStarShip):
     forward = rotation_to_direction(player.get_rotation())
 
-    camera.set_position(player.get_position() - forward * Vector3(2))
+    camera.set_position(player.get_position() - forward * Vector3(3))
     camera.set_rotation(player.get_rotation())
 
 
@@ -43,11 +43,12 @@ def ship_control(controls_manager: KeyboardControlManager, camera: Camera):
     x = x / width * 2.0 - 1.0
     y = y / height * 2.0 - 1.0
 
-    # Cursor position back to screen center
-    pygame.mouse.set_pos(width / 2, height / 2)
+    if x != 0 or y != 0:
+        # Cursor position back to screen center
+        pygame.mouse.set_pos(width / 2, height / 2)
 
-    delta_rotation = Vector3(x * ANGLE_MOUSE_ACCELERATION,
-                             y * ANGLE_MOUSE_ACCELERATION,
+    delta_rotation = Vector3(y * ANGLE_MOUSE_ACCELERATION,
+                             x * ANGLE_MOUSE_ACCELERATION,
                              0.0)
 
     player.set_rotation(player.get_rotation() + delta_rotation)

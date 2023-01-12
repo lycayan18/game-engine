@@ -10,10 +10,10 @@ class ClientEntity(ViewableEntity):
     def __init__(self, entity: Entity, class_name: str, material: BaseMaterial, mesh: Mesh = None,
                  rotation: Vector3 = None, scale: Vector3 = None):
 
-        rotation = rotation or Vector3(0, 0, 0)
-        scale = scale or Vector3(1, 1, 1)
+        self.rotation = rotation or Vector3(0, 0, 0)
+        self.scale = scale or Vector3(1, 1, 1)
 
-        super().__init__(class_name, entity.position, mesh, rotation, scale)
+        super().__init__(class_name, entity.position, mesh, self.rotation, self.scale)
 
         self.material = material
 
@@ -32,7 +32,7 @@ class ClientEntity(ViewableEntity):
 
     def get_state(self) -> dict:
         state = {
-            **super().get_state(),
+            **super(ClientEntity, self).get_state(),
             'entity_state': self.entity.get_state()
         }
 

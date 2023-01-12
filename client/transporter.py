@@ -10,14 +10,17 @@ class Transporter:
         self.transmitter.on('response', self.handle_server_response)
         self.callbacks = {}
 
-    def send(self, data: Union[dict, str], callback: Callable):
+    def send(self, data: Union[dict, str], callback: Callable, need_response: bool = True):
         request = {
             'id': self.id_count,
             'request': data
         }
 
         self.transmitter.send_data(json.dumps(request))
-        self.callbacks[self.id_count] = callback
+
+        if need_response:
+            self.callbacks[self.id_count] = callback
+
         self.id_count += 1
 
     def handle_server_response(self, response_data: str):

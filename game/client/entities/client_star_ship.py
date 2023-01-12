@@ -25,6 +25,8 @@ class ClientStarShip(ClientEntity):
             class_name, material, mesh, rotation, scale
         )
 
+        self.weapon = weapon
+
     def dead_animation(self):
         self.push_event({
             "type": "play_dead_animation"
@@ -67,7 +69,9 @@ class ClientStarShip(ClientEntity):
             if currently_registering_events:
                 self.start_registering_events()
 
-        return super().emit_events(events)
+        super().emit_events(events)
+
+        self.rotation = self.entity.rotation
 
     # These are just wrappers as this class is a StarShip entity wrapper
 
@@ -79,6 +83,9 @@ class ClientStarShip(ClientEntity):
 
         # Update link to position
         self.position = self.entity.position
+
+        self.entity.rotation = self.rotation
+        self.weapon.set_owner(self.id)
 
     def get_last_events(self) -> list[dict]:
         return self.entity.get_last_events()
@@ -94,6 +101,14 @@ class ClientStarShip(ClientEntity):
         entity = ClientStarShip(Vector3(0, 0, 0), weapon,
                                 state['class_name'], ClientStarShip.material, ClientStarShip.mesh)
 
+        entity.id = state["id"]
+        entity.weapon.set_owner(entity.id)
+
         entity.set_state(state)
+
+        # Set initial rotation
+        entity.rotation.x = state["rotation"]["x"]
+        entity.rotation.y = state["rotation"]["y"]
+        entity.rotation.z = state["rotation"]["z"]
 
         return entity

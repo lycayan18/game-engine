@@ -6,10 +6,12 @@ from game.lib.rotation_to_direction import rotation_to_direction
 
 
 class StarShip(Player):
-    def __init__(self, weapon: Weapon, speed: int = 300, weight: int = 1000, rotation: Vector3 = None,
+    def __init__(self, weapon: Weapon, speed: int = 5/60, weight: int = 1000, rotation: Vector3 = None,
                  *args, **kwargs):
         super(StarShip, self).__init__(*args, **kwargs)
         self.weapon = weapon
+        self.weapon.set_owner(self.id)
+
         self.speed = speed
         self.weight = weight
         self.rotation = rotation or Vector3(0, 0, 0)
@@ -28,7 +30,7 @@ class StarShip(Player):
 
     def move(self):
         direction = rotation_to_direction(self.rotation)
-        self.position += direction * self.speed
+        self.position += direction * Vector3(self.speed * 0.0)
 
     def set_rotation(self, rotation: Vector3):
         self.rotation = rotation
@@ -51,7 +53,7 @@ class StarShip(Player):
             'speed': self.speed
         })
 
-    def shoot_event(self, position: Vector3, rotation: Vector3):
+    def shoot_event(self, position: Vector3, rotation: Vector3, weapon_state: dict):
         """
         Shoots by weapon from provided position.
         Useful for events as this function provides convenient interface for emitting
@@ -59,9 +61,12 @@ class StarShip(Player):
         For shooting call "shoot" function, this function is for other purposes.
         """
 
+        self.weapon.set_state(weapon_state)
+
         if self.weapon.shoot(current_position=position, rotation=rotation):
             self.push_event({
                 "type": "weapon_shoot",
+                "weapon_state": weapon_state,
                 "position": {
                     "x": position.x,
                     "y": position.y,
@@ -75,15 +80,17 @@ class StarShip(Player):
             })
 
     def shoot(self):
-        self.shoot_event(self.position, self.rotation)
+        self.shoot_event(self.position, self.rotation, self.weapon.get_state())
+
+    def think(self):
+        self.move()
 
     def set_state(self, state: dict):
         super(StarShip, self).set_state(state)
 
         self.weapon.set_state(state.get("weapon"))
 
-        self.rotation = Vector3(
-            state['rotation']['x'], state['rotation']['y'], state['rotation']['z'])
+        self.rotation = Vector3(**state['rotation'])
 
     def get_state(self) -> dict:
         state = {
@@ -111,7 +118,7 @@ class StarShip(Player):
 
             if event.get("type", None) == "weapon_shoot":
                 self.shoot_event(
-                    Vector3(**event["position"]), Vector3(**event["rotation"]))
+                    Vector3(**event["position"]), Vector3(**event["rotation"]), event["weapon_state"])
             elif event.get("type", None) == "set_speed":
                 self.set_speed(event["speed"])
             elif event.get("type", None) == "set_rotation":

@@ -35,5 +35,6 @@ def generate_star_ship(world: World, id: int = 0) -> StarShip:
     star_ship = StarShip(weapon=LaserGun(
         world), position=position, class_name="player_starship")
     star_ship.id = id
+    star_ship.weapon.set_owner(id)
 
     return star_ship

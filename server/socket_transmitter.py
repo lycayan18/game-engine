@@ -9,9 +9,8 @@ class SocketTransmitter:
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.bind((ip, port))
+        self.sock.settimeout(0.00)
         self.sock.listen(5)
-
-        self.sock.settimeout(0)
 
         self.clients: list[socket.socket] = []
 

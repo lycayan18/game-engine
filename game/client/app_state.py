@@ -1,6 +1,7 @@
 from core.utils.event_emitter import EventEmitter
 from core.entities.player import Player
 from core.world import World
+from client.client_engine import ClientEngine
 from client.camera import Camera
 
 
@@ -15,7 +16,18 @@ class AppState:
     current_player_entity = None
     camera = None
     world = None
+    engine = None
     event_emitter = EventEmitter()
+
+    @staticmethod
+    def set_engine(engine: ClientEngine):
+        AppState.engine = engine
+
+        AppState.event_emitter.emit("engine_changed", engine)
+
+    @staticmethod
+    def get_engine() -> ClientEngine:
+        return AppState.engine
 
     @staticmethod
     def set_world(world: World):

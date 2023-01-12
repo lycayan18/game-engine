@@ -12,10 +12,11 @@ def init_client_entities(engine: Client):
     Setups static variables for client entities such as materials, sounds, etc.
     """
 
-    ClientStarShip.mesh = Mesh(generate_box(Vector3(0.01)), engine)
+    ClientStarShip.mesh = Mesh(generate_box(
+        Vector3(1.214 * 0.25, 0.8 * 0.25, 2.0 * 0.25)), engine)
     ClientStarShip.material = DiffuseMaterial(
         engine, Vector3(0, 0, -1), [1, 1, 1])
 
-    LaserBullet.mesh = Mesh(generate_box(Vector3(0.01)), engine)
+    LaserBullet.mesh = Mesh(generate_box(Vector3(0.1)), engine)
     LaserBullet.material = DiffuseMaterial(
         engine, Vector3(0, 0, -1), [1, 1, 1])
