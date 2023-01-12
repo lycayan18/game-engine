@@ -13,6 +13,7 @@ from game.client.load_assets import load_assets
 from game.client.init_client_entities import init_client_entities
 from game.client.ship_control import ship_control
 from game.client.setup_background_sounds import setup_background_sounds
+from game.client.UI.ui import init_ui, draw_ui
 
 controls_manager = KeyboardControlManager()
 
@@ -46,6 +47,8 @@ def init_modules(engine: Client):
     sound_module = PygameSoundModule(renderer.get_camera())
 
     engine.add_module(sound_module)
+
+    init_ui(renderer, *AppState.get_screen_resolution())
 
 
 # ********************************************************
@@ -181,6 +184,8 @@ def main(ip: str, port: int):
         engine.tick()
 
         if frame % 3 == 0:
+            draw_ui()
+
             if player.entity.health < 0:
                 engine.send_respawn_request()
 

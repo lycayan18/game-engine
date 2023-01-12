@@ -44,6 +44,9 @@ class ClientStarShip(ClientEntity):
 
         self.weapon = weapon
 
+    def get_health(self):
+        return self.entity.health
+
     def dead_animation(self):
         self.push_event({
             "type": "play_dead_animation"

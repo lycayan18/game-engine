@@ -16,8 +16,8 @@ def init_client_entities(engine: Client):
 
     ClientStarShip.mesh = Mesh(generate_box(
         Vector3(1.214 * 0.25, 0.8 * 0.25, 2.0 * 0.25)), engine)
-    ClientStarShip.material = DiffuseMaterial(
-        engine, Vector3(0, 0, -1), [1, 1, 1])
+    ClientStarShip.material = ColoredMaterial(
+        engine, [1, 1, 1])
 
     LaserBullet.mesh = Mesh(generate_sphere(0.5, 12, 6), engine)
     LaserBullet.material = ColoredMaterial(

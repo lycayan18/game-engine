@@ -11,7 +11,7 @@ class LaserGun(ProjectileShootingWeapon):
         bullet_speed = 10
         bullet_count = 500
         max_bullets_in_clip = 50
-        max_distance = 100
+        max_distance = 1000
 
         super(LaserGun, self).__init__(world=world, bullet=Bullet, damage=damage,
                                        bullet_recharge_time=bullet_recharge_time,

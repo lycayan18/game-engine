@@ -41,15 +41,16 @@ class Planet(MapObject):
         return state
 
     def think(self):
-        for entity in self.world.entities:
-            if isinstance(entity, StarShip):
-                force = self.calculate_gravity(entity)
+        pass
+        # for entity in self.world.entities:
+        #     if isinstance(entity, StarShip):
+        #         force = self.calculate_gravity(entity)
 
-                entity.acceleration += Vector3.normalized(
-                    self.position - entity.position) * Vector3(force)
+        #         entity.acceleration += Vector3.normalized(
+        #             self.position - entity.position) * Vector3(force)
 
-                if self.sphere.collide_point(entity.get_position()):
-                    entity.dead()
+        #         if self.sphere.collide_point(entity.get_position()):
+        #             entity.dead()
 
     @staticmethod
     def from_state(state: dict, world: World = None):

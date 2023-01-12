@@ -1,4 +1,5 @@
 from PIL import Image
+from core.utils.event_emitter import EventEmitter
 from client.client_engine import ClientEngine
 
 
@@ -10,6 +11,7 @@ class Texture2D:
 
         self.registered = False
         self.engine = engine
+        self.event_emitter = EventEmitter()
 
     def register(self):
         if not self.registered:
@@ -21,6 +23,13 @@ class Texture2D:
 
     def get_data(self):
         return self.data
+
+    def update(self):
+        """
+        Emits update event. Useful when updating texture data to mark renderers that they can update
+        texture data.
+        """
+        self.event_emitter.emit("update", self)
 
     def load_from_data(self, data):
         self.data = data

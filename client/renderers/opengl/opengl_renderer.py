@@ -3,6 +3,7 @@ import ctypes
 import glm
 from OpenGL.GL import *
 
+from pythree import Geometry
 from client.client_map_object import ClientMapObject
 from core.mesh import Mesh
 from core.module import BaseModule
@@ -13,6 +14,7 @@ from client.graphics_module import GraphicsModule
 from client.camera import Camera
 from client.base_material import BaseMaterial
 from client.texture2d import Texture2D
+from client.renderers.opengl.shaders.ui import FREE_TEXTURED_VERTEX_SHADER, FREE_TEXTURED_FRAGMENT_SHADER
 
 
 class OpenGLRenderer(GraphicsModule):
@@ -24,6 +26,9 @@ class OpenGLRenderer(GraphicsModule):
         self.height = height
         self.shaders: dict = {}
         self.textures: list[dict] = []
+        self.ui_texture = None
+        self.ui_shader = None
+        self.ui_vertex_buffer = None
 
         self.init_gl()
 
@@ -35,6 +40,8 @@ class OpenGLRenderer(GraphicsModule):
         event_emitter.on("material_registered", self.register_material)
         event_emitter.on("texture_registered", self.register_texture)
 
+        self.init_ui()
+
     def init_gl(self):
         vao = GLuint(0)
 
@@ -43,6 +50,10 @@ class OpenGLRenderer(GraphicsModule):
 
         glEnable(GL_DEPTH_TEST)
         glDepthFunc(GL_LEQUAL)
+
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+        glBlendEquation(GL_FUNC_ADD)
 
     def register_material(self, material: BaseMaterial):
         name = material.get_name()
@@ -54,6 +65,31 @@ class OpenGLRenderer(GraphicsModule):
             material.get_vertex_source(), material.get_fragment_source())
 
         self.shaders[name] = shader
+
+    def init_ui(self):
+        """
+        Generates vertices for UI plane, compiles shader and etc.
+        """
+
+        self.ui_shader = self.create_shader(
+            FREE_TEXTURED_VERTEX_SHADER, FREE_TEXTURED_FRAGMENT_SHADER)
+
+        self.ui_vertex_buffer = self.generate_array_buffer(Geometry(
+            [
+                -1.0, -1.0, 0.0,
+                +1.0, -1.0, 0.0,
+                +1.0, +1.0, 0.0,
+                +1.0, +1.0, 0.0,
+                -1.0, +1.0, 0.0,
+                -1.0, -1.0, 0.0
+            ]
+        ).get_vertices_as_bytes())
+
+    def set_ui_texture(self, texture: Texture2D):
+        for pair in self.textures:
+            if pair["texture"] == texture:
+                self.ui_texture = pair["buffer"]
+                break
 
     def register_texture(self, texture: Texture2D):
         buffer = glGenTextures(1)
@@ -74,10 +110,27 @@ class OpenGLRenderer(GraphicsModule):
 
         glGenerateMipmap(GL_TEXTURE_2D)
 
+        index = len(self.textures)
+
+        texture.event_emitter.on(
+            "update", lambda texture: self.handle_texture_update(texture, index))
+
         self.textures.append({
             "texture": texture,
             "buffer": buffer
         })
+
+    def handle_texture_update(self, texture: Texture2D, index: int):
+        buffer = self.textures[index]["buffer"]
+
+        glBindTexture(GL_TEXTURE_2D, buffer)
+
+        data = texture.get_data()
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *texture.get_size(),
+                     0, GL_RGBA, GL_UNSIGNED_BYTE, data)
+
+        glGenerateMipmap(GL_TEXTURE_2D)
 
     def create_shader(self, vertex_source: str, fragment_source: str):
         vertex = glCreateShader(GL_VERTEX_SHADER)
@@ -135,12 +188,12 @@ class OpenGLRenderer(GraphicsModule):
         return buffer
 
     def draw(self):
-        glClearColor(0.0, 0.0, 0.0, 1.0)
+        glClearColor(0.1, 0.1, 0.1, 1.0)
         glClearDepth(1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         projection_matrix = glm.perspective(
-            glm.radians(90), self.width / self.height, 0.1, 1000.0)
+            glm.radians(90), self.width / self.height, 0.1, 10000.0)
 
         # Create camera view matrix
 
@@ -287,6 +340,29 @@ class OpenGLRenderer(GraphicsModule):
                 glDrawArrays(GL_TRIANGLES, 0, int(len(
                     entity.mesh.geometry.get_vertices()) / 3))
 
+        # *************************************************
+        # * Draw UI
+        # *************************************************
+        if self.ui_shader is None or self.ui_texture is None:
+            return
+
+        glUseProgram(self.ui_shader)
+
+        position_location = glGetAttribLocation(self.ui_shader, "position")
+        screen_size = glGetUniformLocation(self.ui_shader, "screenSize")
+        texture_sampler = glGetUniformLocation(
+            self.ui_shader, "textureSampler")
+
+        self.set_uniform_value(screen_size, [self.width, self.height], "2fv")
+        self.set_uniform_value(texture_sampler, self.ui_texture, "buffer2D")
+
+        glBindBuffer(GL_ARRAY_BUFFER, self.ui_vertex_buffer)
+        glEnableVertexAttribArray(position_location)
+        glVertexAttribPointer(position_location, 3,
+                              GL_FLOAT, False, 0, ctypes.c_void_p(0))
+
+        glDrawArrays(GL_TRIANGLES, 0, 6)
+
     def set_uniform_value(self, location, value, type: str, active_texture: int = 0):
         if type in ["1f", "1fv"]:
             glUniform1f(location, value)
@@ -310,6 +386,12 @@ class OpenGLRenderer(GraphicsModule):
             glUniformMatrix3fv(location, False, value)
         elif type == "mat4":
             glUniformMatrix4fv(location, False, value)
+        elif type == "buffer2D":
+            glActiveTexture(GL_TEXTURE0 + active_texture)
+            glBindTexture(GL_TEXTURE_2D, value)
+            glUniform1i(location, active_texture)
+
+            return active_texture + 1
         elif type == "texture2D":
             glActiveTexture(GL_TEXTURE0 + active_texture)
 
