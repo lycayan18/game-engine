@@ -180,3 +180,6 @@ def main(ip: str, port: int):
 
         pygame.display.flip()
         clock.tick(60)
+
+
+main('192.168.0.109', 2752)

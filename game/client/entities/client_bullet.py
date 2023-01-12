@@ -11,6 +11,13 @@ class ClientBullet(ClientEntity):
         super(ClientBullet, self).__init__(bullet, bullet.class_name, material, mesh, bullet.rotation, scale)
         self.bullet = bullet
 
+    def get_state(self):
+        return self.bullet.get_state()
+
+    def set_state(self, state):
+        self.bullet.set_state(state)
+        self.rotation = self.bullet.rotation
+
     def calculate_distance(self):
         self.bullet.calculate_distance()
 

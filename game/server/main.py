@@ -19,3 +19,6 @@ def main(ip, port):
         except Exception as e:
             server.shutdown()
             raise e
+
+
+main('192.168.0.109', 2752)

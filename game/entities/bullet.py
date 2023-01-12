@@ -48,3 +48,7 @@ class Bullet(Entity):
         for entity in self.world.entities:
             if isinstance(entity, StarShip):
                 self.collision_check(entity)
+
+    @staticmethod
+    def from_state(state: dict):
+        return Bullet.set_state(state)
