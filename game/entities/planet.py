@@ -1,6 +1,7 @@
 from core.map_object import MapObject
 from core.world import World
 from game.entities.star_ship import StarShip
+from game.entities.bullet import Bullet
 from core.vector3 import Vector3
 from game.lib.collision_detection.shapes.sphere import Sphere
 
@@ -41,16 +42,15 @@ class Planet(MapObject):
         return state
 
     def think(self):
-        pass
-        # for entity in self.world.entities:
-        #     if isinstance(entity, StarShip):
-        #         force = self.calculate_gravity(entity)
+        for entity in self.world.entities:
+            if isinstance(entity, StarShip):
+                force = self.calculate_gravity(entity)
 
-        #         entity.acceleration += Vector3.normalized(
-        #             self.position - entity.position) * Vector3(force)
+                entity.acceleration += Vector3.normalized(
+                    self.position - entity.position) * Vector3(force)
 
-        #         if self.sphere.collide_point(entity.get_position()):
-        #             entity.dead()
+                if self.sphere.collide_point(entity.get_position()):
+                    entity.dead()
 
     @staticmethod
     def from_state(state: dict, world: World = None):

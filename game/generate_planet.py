@@ -12,7 +12,7 @@ def generate_planet(world: World, planet_count: int):
 
         radius = randint(30, 50)
 
-        planet = Planet(world, radius=radius, weight=radius * 100, position=position,
+        planet = Planet(world, radius=radius, weight=radius * 50, position=position,
                         class_name='map_object_planet')
 
         world.add_map_object(planet)
