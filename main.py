@@ -2,6 +2,7 @@ import sys
 
 from game.client.main import main as client_main
 from game.server.main import main as server_main
+from game.client.UI.menu import menu
 
 if len(sys.argv) <= 1:
     print("Help:")
@@ -15,6 +16,6 @@ else:
     elif sys.argv[1] == '--client':
         ip, port = sys.argv[2].split(':')
 
-        client_main(ip, int(port))
+        menu()
     else:
         print(f"Unknown parameter \"{sys.argv[1]}\"")

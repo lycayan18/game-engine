@@ -20,5 +20,3 @@ def main(ip, port):
             server.shutdown()
             raise e
 
-
-main('192.168.0.109', 2752)

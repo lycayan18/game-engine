@@ -10,6 +10,7 @@ class HealthyEntity(Entity):
 
     def dead(self):
         self.alive = False
+        self.health = -1
 
     def heal(self, amount_health: float):
         self.health += amount_health

@@ -42,13 +42,13 @@ class ClientEngine(Engine):
     def send_events(self):
         self.send_command("push_events",
                           {"events": self.world.get_last_events()},
-                          None)
+                          None, False)
 
-    def send_command(self, command: str, parameters: dict, callback: Callable[[Any], None]):
+    def send_command(self, command: str, parameters: dict, callback: Callable[[Any], None], need_response: bool = True):
         self.transporter.send({
             "command": command,
             "parameters": parameters
-        }, callback)
+        }, callback, need_response)
 
     def tick(self):
         super(ClientEngine, self).tick()

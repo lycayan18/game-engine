@@ -49,7 +49,7 @@ class World:
 
         # Delete all not included in world state entities
         for entity in self.entities:
-            if entity.id not in updated_entities_id:
+            if entity.id not in updated_entities_id and entity.id >= 0:
                 self.remove_entity(entity)
 
         # Update map object states

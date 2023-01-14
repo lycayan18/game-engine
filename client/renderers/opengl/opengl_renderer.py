@@ -1,4 +1,4 @@
-import struct
+from datetime import datetime
 import ctypes
 import glm
 from OpenGL.GL import *
@@ -135,12 +135,12 @@ class OpenGLRenderer(GraphicsModule):
         return buffer
 
     def draw(self):
-        glClearColor(0.0, 0.0, 0.3, 1.0)
+        glClearColor(0.0, 0.0, 0.0, 1.0)
         glClearDepth(1.0)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
         projection_matrix = glm.perspective(
-            glm.radians(90), self.width / self.height, 0.1, 100.0)
+            glm.radians(90), self.width / self.height, 0.1, 1000.0)
 
         # Create camera view matrix
 
@@ -176,14 +176,15 @@ class OpenGLRenderer(GraphicsModule):
 
         for entity in self.world.entities + self.world.map_objects:
             if isinstance(entity, ClientEntity) or isinstance(entity, ClientMapObject):
+                if not entity.visible:
+                    continue
+
                 # *************************************************
                 # * Generate matrices
                 # *************************************************
 
                 material = entity.get_material()
                 program = self.shaders[material.get_name()]
-
-                # print(program)
 
                 glUseProgram(program)
 
@@ -248,6 +249,8 @@ class OpenGLRenderer(GraphicsModule):
                 # * Setup material uniforms
                 # *************************************************
 
+                start = datetime.now()
+
                 active_texture = 0
 
                 for uniform in material.get_uniforms():
@@ -260,26 +263,26 @@ class OpenGLRenderer(GraphicsModule):
                 # * Draw entity
                 # *************************************************
 
-                # Search buffer
-                for vertex_buffer, normals_buffer, uvs_buffer, mesh in self.buffer_mesh_pairs:
-                    if mesh == entity.mesh:
-                        if normal_location > -1:
-                            glBindBuffer(GL_ARRAY_BUFFER, normals_buffer)
-                            glVertexAttribPointer(
-                                normal_location, 3, GL_FLOAT, True, 0, ctypes.c_void_p(0))
-                            glEnableVertexAttribArray(normal_location)
+                vertex_buffer = entity.mesh.get_vertex_buffer()
+                normals_buffer = entity.mesh.get_normal_buffer()
+                uvs_buffer = entity.mesh.get_uv_buffer()
 
-                        if uv_location > -1:
-                            glBindBuffer(GL_ARRAY_BUFFER, uvs_buffer)
-                            glVertexAttribPointer(
-                                uv_location, 2, GL_FLOAT, True, 0, ctypes.c_void_p(0))
-                            glEnableVertexAttribArray(uv_location)
+                if normal_location > -1:
+                    glBindBuffer(GL_ARRAY_BUFFER, normals_buffer)
+                    glVertexAttribPointer(
+                        normal_location, 3, GL_FLOAT, True, 0, ctypes.c_void_p(0))
+                    glEnableVertexAttribArray(normal_location)
 
-                        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
-                        glEnableVertexAttribArray(position_location)
-                        glVertexAttribPointer(
-                            position_location, 3, GL_FLOAT, False, 0, ctypes.c_void_p(0))
-                        break
+                if uv_location > -1:
+                    glBindBuffer(GL_ARRAY_BUFFER, uvs_buffer)
+                    glVertexAttribPointer(
+                        uv_location, 2, GL_FLOAT, True, 0, ctypes.c_void_p(0))
+                    glEnableVertexAttribArray(uv_location)
+
+                glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer)
+                glEnableVertexAttribArray(position_location)
+                glVertexAttribPointer(
+                    position_location, 3, GL_FLOAT, False, 0, ctypes.c_void_p(0))
 
                 glDrawArrays(GL_TRIANGLES, 0, int(len(
                     entity.mesh.geometry.get_vertices()) / 3))
@@ -331,6 +334,10 @@ class OpenGLRenderer(GraphicsModule):
         vertex_buffer = self.generate_array_buffer(vertex_data)
         normals_buffer = self.generate_array_buffer(normals_data)
         uvs_buffer = self.generate_array_buffer(uvs_data)
+
+        mesh.set_vertex_buffer(vertex_buffer)
+        mesh.set_normal_buffer(normals_buffer)
+        mesh.set_uv_buffer(uvs_buffer)
 
         self.buffer_mesh_pairs.append(
             (vertex_buffer, normals_buffer, uvs_buffer, mesh))

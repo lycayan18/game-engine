@@ -15,6 +15,9 @@ class PygameSound(Sound):
         self.current_channel = self.sound.play(-1 if self.repeatable else 0)
 
     def stop(self):
+        if not self.current_channel:
+            return
+
         self.event_emitter.emit("stop")
 
         self.current_channel.stop()
@@ -30,7 +33,7 @@ class PygameSound(Sound):
         if self.current_channel:
             if not self.current_channel.get_busy():
                 if self.repeatable:
-                    self.current_channel.play()
+                    self.current_channel.play(self.sound)
                 else:
                     self.current_channel = None
 

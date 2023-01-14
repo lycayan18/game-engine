@@ -1,9 +1,12 @@
-from client.base_material import BaseMaterial
-from client.client_map_object import ClientMapObject
-from core.mesh import Mesh
 from core.vector3 import Vector3
+from core.mesh import Mesh
+from client.base_material import BaseMaterial
+from client.materials.diffuse import DiffuseMaterial
+from client.client_map_object import ClientMapObject
 from game.entities.planet import Planet
 from game.entities.star_ship import StarShip
+from game.lib.mesh_generator.sphere import generate_sphere
+from game.client.app_state import AppState
 
 
 class ClientPlanet(ClientMapObject):
@@ -27,6 +30,15 @@ class ClientPlanet(ClientMapObject):
         self.map_object.get_state()
 
     @staticmethod
-    def from_state(state: dict, material: BaseMaterial = None, mesh: Mesh = None):
-        planet = Planet.from_state(state)
-        return ClientPlanet(planet, material, mesh)
+    def from_state(state: dict):
+        material = DiffuseMaterial(AppState.get_engine(), Vector3(
+            0.0, -1.0, 0.0), [0.33, 0.08, 1.0])
+
+        planet = Planet.from_state(state, AppState.get_world())
+
+        obj = ClientPlanet(planet, material, Mesh(
+            generate_sphere(planet.radius, 32, 16), AppState.get_engine()))
+
+        obj.id = planet.id
+
+        return obj

@@ -1,3 +1,4 @@
+from datetime import timedelta
 from core.world import World
 from game.weapons.weapon import Weapon
 from client.sound import Sound
@@ -22,6 +23,7 @@ class ClientWeapon:
         self.recharge()
 
         if self.shoot_sound:
+            self.shoot_sound.stop()
             self.shoot_sound.play()
 
         # We don't need to call super.shoot as we don't want bullet to be spawned.
@@ -47,11 +49,18 @@ class ClientWeapon:
     def recharge(self):
         self.weapon.recharge()
 
+    def set_owner(self, owner: int):
+        self.weapon.set_owner(owner)
+
     def get_state(self) -> dict:
         return self.weapon.get_state()
 
     def set_state(self, state: dict) -> dict:
-        self.weapon.set_state(state)
+        self.weapon.set_state({
+            **state,
+            # To avoid double-playing sound
+            "next_shot": max(state["next_shot"], self.weapon.next_shot.seconds + self.weapon.next_shot.microseconds / 1000000)
+        })
 
     @staticmethod
     def from_state(state: dict, world: World, shoot_sound: Sound = None):

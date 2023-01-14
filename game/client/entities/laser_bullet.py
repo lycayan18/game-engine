@@ -8,5 +8,4 @@ class LaserBullet(ClientBullet):
 
     @staticmethod
     def from_state(state: dict):
-        bullet = Bullet.from_state(state)
-        return ClientBullet(bullet, LaserBullet.material, LaserBullet.mesh)
+        return ClientBullet.from_state(state, LaserBullet.material, LaserBullet.mesh)

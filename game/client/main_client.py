@@ -25,6 +25,10 @@ class Client(ClientEngine):
     def request_client_id(self):
         self.send_command("get_client_id", {}, self.set_client_id)
 
+    def send_respawn_request(self):
+        self.send_command(
+            "respawn", {"client_id": self.client_id}, None, False)
+
     def request_current_entity_id(self):
         """
         Requests player's current entity id.\n

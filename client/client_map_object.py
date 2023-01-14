@@ -8,7 +8,7 @@ from client.materials.default import DefaultMaterial
 
 class ClientMapObject(ViewableMapObject):
     def __init__(self, map_object: MapObject, class_name: str, material: BaseMaterial, mesh: Mesh = None,
-                 rotation: Vector3 = None, scale: Vector3 = None):
+                 rotation: Vector3 = None, scale: Vector3 = None, visible: bool = True):
 
         rotation = rotation or Vector3(0, 0, 0)
         scale = scale or Vector3(1, 1, 1)
@@ -16,7 +16,7 @@ class ClientMapObject(ViewableMapObject):
         super().__init__(class_name, map_object.position, mesh, rotation, scale)
 
         self.material = material
-
+        self.visible = visible
         self.map_object = map_object
 
     def get_material(self):

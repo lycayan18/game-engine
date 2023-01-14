@@ -1,6 +1,6 @@
 import sys
 import pygame
-from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule
+from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule, PygameSound
 from game.client.app_state import AppState
 from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
@@ -12,6 +12,7 @@ from game.utils.keyboard_control_manager import KeyboardControlManager
 from game.client.load_assets import load_assets
 from game.client.init_client_entities import init_client_entities
 from game.client.ship_control import ship_control
+from game.client.setup_background_sounds import setup_background_sounds
 
 controls_manager = KeyboardControlManager()
 
@@ -97,14 +98,14 @@ def wait_for_current_player_entity(engine: Client):
         run_basic_routine()
 
 
-def wait_for_first_world_state(engine: Client, world: World):
+def wait_for_first_world_state(engine: Client, world: World, id: int):
     """
     Requests world state and waits for it.
     """
 
     update_all(engine)
 
-    while not world.entities:
+    while not world.entities or world.get_entity_by_id(id) is None:
         engine.tick()
 
         # Let user at least close the window while waiting
@@ -122,6 +123,7 @@ def main(ip: str, port: int):
 
     controls_manager.bind_key(pygame.K_w, 'forward')
     controls_manager.bind_key(pygame.K_s, 'backward')
+    controls_manager.bind_key(pygame.K_LSHIFT, 'capture')
     controls_manager.bind_key(None, 'shoot')
 
     # Initialize engine, world, modules, etc.
@@ -130,6 +132,7 @@ def main(ip: str, port: int):
     engine = Client(world, ip, port)
 
     AppState.set_world(world)
+    AppState.set_engine(engine)
 
     print("\rInitializing modules...", end='')
 
@@ -151,20 +154,37 @@ def main(ip: str, port: int):
 
     wait_for_current_player_entity(engine)
 
-    wait_for_first_world_state(engine, world)
+    wait_for_first_world_state(engine, world, engine.get_current_entity_id())
 
     AppState.set_current_player_entity(
         world.get_entity_by_id(engine.get_current_entity_id())
     )
 
+    setup_background_sounds()
+
     print("\rDone!                          ")
 
     clock = pygame.time.Clock()
 
+    AppState.get_current_player_entity().start_registering_events()
+
+    player = AppState.get_current_player_entity()
+
+    player.weapon.set_owner(player.id)
+    player.visible = False
+
+    player.shutoff_engine_sound()
+
+    frame = 0
+
     while True:
         engine.tick()
 
-        update_all(engine)
+        if frame % 3 == 0:
+            if player.entity.health < 0:
+                engine.send_respawn_request()
+
+            update_all(engine)
 
         ship_control(controls_manager, AppState.get_camera())
 
@@ -181,5 +201,4 @@ def main(ip: str, port: int):
         pygame.display.flip()
         clock.tick(60)
 
-
-main('192.168.0.109', 2752)
+        frame += 1

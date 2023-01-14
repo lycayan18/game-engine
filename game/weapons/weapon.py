@@ -15,6 +15,8 @@ class Weapon:
         self.max_bullets_in_clip = max_bullets_in_clip
         self.current_bullets_in_clip = max_bullets_in_clip
 
+        self.owner = -1
+
         self.max_distance = max_distance
 
         self.next_shot = self.world.get_time()
@@ -22,6 +24,9 @@ class Weapon:
     def shoot(self, *args, **kwargs):
         # Child classes should realise this functionality
         pass
+
+    def set_owner(self, owner: int):
+        self.owner = owner
 
     def get_bullets_count(self) -> int:
         return self.bullet_count
@@ -63,6 +68,7 @@ class Weapon:
             'bullet_recharge_time': self.bullet_recharge_time,
             'next_shot': self.next_shot.seconds + self.next_shot.microseconds / 1000000,
             'bullet_count': self.bullet_count,
+            'owner': self.owner,
             'current_bullets_in_clip': self.current_bullets_in_clip,
             'max_bullets_in_clip': self.max_bullets_in_clip,
             'max_distance': self.max_distance,
@@ -79,6 +85,7 @@ class Weapon:
         self.bullet_count = state.get('bullet_count')
         self.max_bullets_in_clip = state.get('max_bullets_in_clip')
         self.current_bullets_in_clip = state.get('current_bullets_in_clip')
+        self.owner = state.get('owner')
 
         self.max_distance = state.get('max_distance')
 
