@@ -15,7 +15,7 @@ class Transmitter:
         self.event_emitter.on(data, callback)
 
     def send_data(self, data: str):
-        # To send all data through sockets, without sockets to wait untill buffer fills up
+        # To send all data through sockets, without sockets to wait until buffer fills up
         to_send = data + ' ' * (4096 - (len(data) + 1) % 4096) + '/'
 
         self.sock.send(to_send.encode('utf-8'))

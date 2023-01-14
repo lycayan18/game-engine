@@ -1,9 +1,11 @@
+from typing import Union
+
 from core.vector3 import Vector3
 from game.lib.collision_detection.shapes.shape import Shape
 from game.lib.collision_detection.transform_point import transform_point
 
 
-def intersect_AABB_line(ray_origin: Vector3, ray_direction: Vector3, box_size: Vector3):
+def intersect_AABB_line(ray_origin: Vector3, ray_direction: Vector3, box_size: Vector3) -> Union[float, None]:
     """
     Returns intersection point of a line and Axis Aligned Bounding Box if box and lines intersect and None otherwise.
     """
@@ -38,12 +40,12 @@ class Box(Shape):
                                 Vector3(-1), self.rotation)
 
         return (
-            local.x >= -self.size.x and
-            local.x <= self.size.x and
-            local.y >= -self.size.y and
-            local.y <= self.size.y and
-            local.z >= -self.size.z and
-            local.z <= self.size.z
+                local.x >= -self.size.x and
+                local.x <= self.size.x and
+                local.y >= -self.size.y and
+                local.y <= self.size.y and
+                local.z >= -self.size.z and
+                local.z <= self.size.z
         )
 
     def line_intersection(self, a: Vector3, b: Vector3) -> Vector3:
@@ -59,7 +61,5 @@ class Box(Shape):
 
         distance = intersect_AABB_line(local_a, direction, self.size)
 
-        if distance is not None and distance > 0.0 and distance < Vector3.distance(a, b):
+        if distance is not None and 0.0 < distance < Vector3.distance(a, b):
             return a + Vector3.normalized(b - a) * Vector3(distance)
-
-        return None

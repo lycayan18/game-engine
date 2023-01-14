@@ -32,5 +32,3 @@ class Shape:
             (self.position.y - a.y) == (b.y - a.y) and
                 (self.position.z - a.z) == (b.z - a.z)):
             return self.position
-
-        return None

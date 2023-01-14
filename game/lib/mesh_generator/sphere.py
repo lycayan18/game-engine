@@ -5,7 +5,6 @@ YOU CANNOT BEAT CODE WRITTEN BY THE DEVIL ITSELF!
 
 import math
 from pythree import Geometry
-from core.vector3 import Vector3
 
 
 def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
@@ -15,9 +14,9 @@ def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
 
     # Generate points ( vertexes ) and normals/uvs for them
 
-    vertexes: list[list[float]] = []
-    vertex_uvs: list[list[float]] = []
-    vertex_normals: list[list[float]] = []
+    vertexes: list[tuple[float, float, float]] = []
+    vertex_uvs: list[tuple[float, float]] = []
+    vertex_normals: list[tuple[float, float, float]] = []
 
     vertices: list[float] = []
 
@@ -27,7 +26,7 @@ def generate_sphere(radius: float, n_slices: int, n_stacks: int) -> Geometry:
 
     for i in range(n_stacks - 1):
         # Some magic formulas and lines of code...
-        phi = math.pi * (i + 1) / (n_stacks)
+        phi = math.pi * (i + 1) / n_stacks
 
         for j in range(n_slices):
             theta = 2.0 * math.pi * j / n_slices

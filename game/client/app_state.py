@@ -76,7 +76,7 @@ class AppState:
         AppState.event_emitter.emit("resolution_changed", width, height)
 
     @staticmethod
-    def get_screen_resolution() -> tuple[int]:
+    def get_screen_resolution() -> tuple[int, int]:
         return AppState.screen_resolution
 
     @staticmethod

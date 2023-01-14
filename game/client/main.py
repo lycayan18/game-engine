@@ -1,6 +1,6 @@
 import sys
 import pygame
-from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule, PygameSound
+from client.sound_modules.pygame.pygame_sound_module import PygameSoundModule
 from game.client.app_state import AppState
 from game.constants.registry_associations import CLIENT_REGISTRY_ASSOCIATIONS
 from client.camera import Camera
@@ -34,7 +34,7 @@ def init_modules(engine: Client):
     pygame.display.set_mode(AppState.get_screen_resolution(),
                             flags=pygame.OPENGL | pygame.DOUBLEBUF)
 
-    renderer = OpenGLRenderer(*AppState.get_screen_resolution(), Camera())
+    renderer = OpenGLRenderer(*AppState.get_screen_resolution(), camera=Camera())
 
     AppState.set_camera(renderer.get_camera())
 

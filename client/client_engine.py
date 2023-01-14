@@ -1,9 +1,7 @@
-from client.graphics_module import GraphicsModule
 from client.transporter import Transporter
 from client.transmitter import Transmitter
 from core.engine import Engine
 from core.world import World
-from typing import Union, Callable
 from typing import Any, Callable, Union
 
 
@@ -44,7 +42,7 @@ class ClientEngine(Engine):
                           {"events": self.world.get_last_events()},
                           None, False)
 
-    def send_command(self, command: str, parameters: dict, callback: Callable[[Any], None], need_response: bool = True):
+    def send_command(self, command: str, parameters: dict, callback: Union[Callable[[Any], None], None], need_response: bool = True):
         self.transporter.send({
             "command": command,
             "parameters": parameters

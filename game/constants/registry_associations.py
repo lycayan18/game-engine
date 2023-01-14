@@ -1,4 +1,3 @@
-from game.client.entities.client_bullet import ClientBullet
 from game.client.entities.laser_bullet import LaserBullet
 from game.entities.star_ship import StarShip
 from game.entities.planet import Planet

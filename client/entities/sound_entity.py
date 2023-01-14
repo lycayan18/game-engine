@@ -1,5 +1,4 @@
 from core.vector3 import Vector3
-from core.utils.event_emitter import EventEmitter
 from core.entity import Entity
 from client.sound import Sound
 

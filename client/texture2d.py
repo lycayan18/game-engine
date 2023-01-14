@@ -19,7 +19,7 @@ class Texture2D:
             self.engine.register_texture(self)
 
     def get_size(self):
-        return (self.width, self.height)
+        return self.width, self.height
 
     def get_data(self):
         return self.data

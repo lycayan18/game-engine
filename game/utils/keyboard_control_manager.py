@@ -3,10 +3,10 @@ from core.utils.event_emitter import EventEmitter
 
 class KeyboardControlManager:
     def __init__(self):
-        self.keys: dict[list[str]] = {}
+        self.keys: dict[int, list[str]] = {}
 
         # Dictionary, representing action ( key ) - how many keys are triggering this action ( value )
-        self.actions: dict[int] = {}
+        self.actions: dict[str, int] = {}
 
     def bind_key(self, key: int, action: str):
         if key not in self.keys:

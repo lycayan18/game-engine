@@ -1,7 +1,5 @@
 from typing import Union, Callable
 
-from datetime import datetime
-
 from core.world import World
 from core.registry import Registry
 from game.entities.star_ship import StarShip

@@ -1,6 +1,5 @@
 from client.client_engine import ClientEngine
 from client.base_material import BaseMaterial
-from core.vector3 import Vector3
 
 COLORED_VERTEX_SHADER = """
 #version 100

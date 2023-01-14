@@ -1,4 +1,3 @@
-from client.sound_modules.pygame.pygame_sound_module import PygameSound
 from game.client.assets.assets import Assets
 
 

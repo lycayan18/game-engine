@@ -42,7 +42,7 @@ def count_to(to: int, current_index: int = 0):
     if to == current_index:
         return None
     else:
-        return ((to, current_index + 1), {})
+        return (to, current_index + 1), {}
 
 
 queue.push(count_to, 6)

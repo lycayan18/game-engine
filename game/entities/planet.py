@@ -54,7 +54,7 @@ class Planet(MapObject):
 
     @staticmethod
     def from_state(state: dict, world: World = None):
-        planet = Planet(world, 0.0, 0.0, None, "")
+        planet = Planet(world, 0.0, 0, None, "")
 
         planet.set_state(state)
 

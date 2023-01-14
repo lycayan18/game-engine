@@ -36,8 +36,7 @@ class World:
 
             if entity is None:
                 # Entity was not found, so create it
-                EntityClass = self.registry.get_constructor(
-                    entity_state["class_name"], Entity)
+                EntityClass = self.registry.get_constructor(entity_state["class_name"], Entity)
 
                 entity = EntityClass.from_state(entity_state)
 
@@ -59,8 +58,7 @@ class World:
 
             if map_object is None:
                 # MapObject was not found, so create it
-                MapObjectClass: MapObject = self.registry.get_constructor(
-                    map_object_state["class_name"], MapObject)
+                MapObjectClass: MapObject = self.registry.get_constructor(map_object_state["class_name"], MapObject)
 
                 map_object = MapObjectClass.from_state(map_object_state)
 

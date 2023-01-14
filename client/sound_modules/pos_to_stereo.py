@@ -23,7 +23,7 @@ def global_pos_to_local_pos(pos: Vector3, camera: Camera) -> Vector3:
     )
 
 
-def get_stereo_coefficients_from_position(pos: Vector3, camera: Camera) -> tuple[float]:
+def get_stereo_coefficients_from_position(pos: Vector3, camera: Camera) -> tuple[float, float]:
     """
     Returns left and right channel coefficients from pos and camera.
     Useful for generating stereo effect from space-travelling sounds.
@@ -39,4 +39,4 @@ def get_stereo_coefficients_from_position(pos: Vector3, camera: Camera) -> tuple
     left = (1.0 - direction.x) / max(distance * distance, 1.0)
     right = (direction.x + 1.0) / max(distance * distance, 1.0)
 
-    return (min(left, 1.0), min(right, 1.0))
+    return min(left, 1.0), min(right, 1.0)

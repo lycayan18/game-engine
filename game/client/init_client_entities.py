@@ -1,6 +1,5 @@
 from core.vector3 import Vector3
 from core.mesh import Mesh
-from client.materials.diffuse import DiffuseMaterial
 from client.materials.colored import ColoredMaterial
 from game.client.entities.laser_bullet import LaserBullet
 from game.lib.mesh_generator.box import generate_box

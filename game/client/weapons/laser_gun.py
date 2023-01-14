@@ -1,4 +1,3 @@
-from client.sound import Sound
 from core.world import World
 from game.weapons.laser_gun import LaserGun
 from game.client.weapons.client_weapon import ClientWeapon

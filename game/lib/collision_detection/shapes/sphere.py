@@ -1,10 +1,11 @@
 from math import sqrt
+from typing import Union
+
 from core.vector3 import Vector3
 from game.lib.collision_detection.shapes.shape import Shape
-from game.lib.collision_detection.transform_point import transform_point
 
 
-def ray_sphere_intersection(ray_origin: Vector3, ray_direction: Vector3, sphere_center: Vector3, sphere_radius: float):
+def ray_sphere_intersection(ray_origin: Vector3, ray_direction: Vector3, sphere_center: Vector3, sphere_radius: float) -> Union[float, None]:
     """
     Returns distance to intersection point in ray direction if line intersects sphere and None otherwise.\n
     I don't know what happens here ¯\\\\_(ツ)_/¯
@@ -44,7 +45,5 @@ class Sphere(Shape):
             a, direction, self.position, self.radius)
 
         # Check that intersection point lies on a segment ( distance > 0 and distance < line segment length )
-        if distance is not None and distance > 0 and distance < Vector3.distance(a, b):
+        if distance is not None and 0 < distance < Vector3.distance(a, b):
             return a + direction * Vector3(distance)
-
-        return None

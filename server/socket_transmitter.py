@@ -64,7 +64,7 @@ class SocketTransmitter:
     def send_data(connection: socket.socket, data: str):
         # we receive the client's data (connection)
         # and send a response based on this data
-        # To send all data through sockets, without sockets to wait untill buffer fills up
+        # To send all data through sockets, without sockets to wait until buffer fills up
         to_send = data + ' ' * (4096 - (len(data) + 1) % 4096) + '/'
 
         connection.send(to_send.encode('utf-8'))

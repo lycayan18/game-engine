@@ -3,7 +3,6 @@ from core.entity import Entity
 from core.vector3 import Vector3
 from core.mesh import Mesh
 from client.base_material import BaseMaterial
-from client.materials.default import DefaultMaterial
 
 
 class ClientEntity(ViewableEntity):
